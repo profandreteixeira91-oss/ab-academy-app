@@ -4,10 +4,73 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { canEnterLesson, getNextLessonOccurrence, getStudentId } from '@/lib/student'
 import { supabase } from '@/lib/supabase'
 
-export default function LessonRoomScreen(){
- const{id}=useLocalSearchParams<{id:string}>();const[loading,setLoading]=useState(true);const[url,setUrl]=useState('');const[name,setName]=useState('Sala de aula');const[allowed,setAllowed]=useState(false);const[error,setError]=useState('')
- useEffect(()=>{async function load(){try{const studentId=await getStudentId();const{data,error:e}=await supabase.from('horarios').select('id,dia_semana,hora_inicio,hora_fim,meet_url,meet_space_name').eq('id',id).eq('aluno_id',studentId).single();if(e)throw e;const{x,y}= {x:data,y:data};void x;void y;const{startAt,endAt}=getNextLessonOccurrence(Number(data.dia_semana),data.hora_inicio,data.hora_fim);setAllowed(canEnterLesson(startAt.toISOString(),endAt.toISOString()));setUrl(data.meet_url||'');setName(data.meet_space_name||'Sala de aula')}catch(e){setError(e instanceof Error?e.message:'Não foi possível abrir a aula.')}finally{setLoading(false)}}void load()},[id])
- if(loading)return<View style={styles.center}><ActivityIndicator size="large"/></View>
- return<View style={styles.container}><Text style={styles.eyebrow}>SALA VIRTUAL</Text><Text style={styles.title}>{name}</Text>{error?<Text style={styles.error}>{error}</Text>:null}{!error&&!allowed?<Text style={styles.text}>O acesso é liberado 5 minutos antes do início da aula.</Text>:null}{!error&&allowed&&url?<Pressable style={styles.button} onPress={()=>void Linking.openURL(url)}><Text style={styles.buttonText}>Entrar na sala</Text></Pressable>:null}{!error&&allowed&&!url?<Text style={styles.text}>A sala virtual ainda não foi criada pelo professor.</Text>:null}<Pressable onPress={()=>router.back()}><Text style={styles.back}>Voltar</Text></Pressable></View>
+export default function LessonRoomScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const [loading, setLoading] = useState(true)
+  const [url, setUrl] = useState('')
+  const [name, setName] = useState('Sala de aula')
+  const [allowed, setAllowed] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const studentId = await getStudentId()
+        const { data, error: queryError } = await supabase
+          .from('horarios')
+          .select('id, dia_semana, hora_inicio, hora_fim, meet_url, meet_space_name')
+          .eq('id', id)
+          .eq('aluno_id', studentId)
+          .single()
+
+        if (queryError) throw queryError
+
+        const { startAt, endAt } = getNextLessonOccurrence(
+          Number(data.dia_semana),
+          data.hora_inicio,
+          data.hora_fim,
+        )
+
+        setAllowed(canEnterLesson(startAt.toISOString(), endAt.toISOString()))
+        setUrl(data.meet_url || '')
+        setName(data.meet_space_name || 'Sala de aula')
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Não foi possível abrir a aula.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    void load()
+  }, [id])
+
+  if (loading) return <View style={styles.center}><ActivityIndicator size="large" /></View>
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.eyebrow}>SALA VIRTUAL</Text>
+      <Text style={styles.title}>{name}</Text>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {!error && !allowed ? <Text style={styles.text}>O acesso é liberado 5 minutos antes do início da aula.</Text> : null}
+      {!error && allowed && url ? (
+        <Pressable style={styles.button} onPress={() => void Linking.openURL(url)}>
+          <Text style={styles.buttonText}>Entrar na sala</Text>
+        </Pressable>
+      ) : null}
+      {!error && allowed && !url ? <Text style={styles.text}>A sala virtual ainda não foi criada pelo professor.</Text> : null}
+      <Pressable onPress={() => router.back()}><Text style={styles.back}>Voltar</Text></Pressable>
+    </View>
+  )
 }
-const styles=StyleSheet.create({center:{flex:1,alignItems:'center',justifyContent:'center',backgroundColor:'#f6f7fb'},container:{flex:1,backgroundColor:'#f6f7fb',padding:24,paddingTop:60},eyebrow:{fontSize:11,fontWeight:'800',letterSpacing:1.1,color:'#667085'},title:{fontSize:28,fontWeight:'800',color:'#111827',marginTop:8},text:{marginTop:16,color:'#667085',lineHeight:22},error:{marginTop:16,color:'#be123c',lineHeight:21},button:{marginTop:24,height:52,borderRadius:14,backgroundColor:'#111827',alignItems:'center',justifyContent:'center'},buttonText:{color:'#fff',fontWeight:'800'},back:{marginTop:22,color:'#2563eb',fontWeight:'700'}})
+
+const styles = StyleSheet.create({
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f6f7fb' },
+  container: { flex: 1, backgroundColor: '#f6f7fb', padding: 24, paddingTop: 60 },
+  eyebrow: { fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: '#667085' },
+  title: { fontSize: 28, fontWeight: '800', color: '#111827', marginTop: 8 },
+  text: { marginTop: 16, color: '#667085', lineHeight: 22 },
+  error: { marginTop: 16, color: '#be123c', lineHeight: 21 },
+  button: { marginTop: 24, height: 52, borderRadius: 14, backgroundColor: '#111827', alignItems: 'center', justifyContent: 'center' },
+  buttonText: { color: '#fff', fontWeight: '800' },
+  back: { marginTop: 22, color: '#2563eb', fontWeight: '700' },
+})
