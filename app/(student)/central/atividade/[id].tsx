@@ -80,7 +80,7 @@ function normalizeContent(raw: Record<string, unknown>): Content {
     correctOrder: c.correctOrder || c.ordem_correta?.map(String),
     blanks: c.blanks || c.lacunas?.map((blank, index) => ({
       id: blank.id || String(index),
-      answer: blank.answer || blank.resposta,
+      answer: blank.resposta,
       acceptableAnswers: blank.acceptableAnswers,
     })),
   }
