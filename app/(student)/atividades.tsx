@@ -1,16 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
-
-export default function AtividadesScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Atividades</Text>
-      <Text style={styles.subtitle}>Suas atividades aparecerão aqui.</Text>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f6f7fb', padding: 24, paddingTop: 64 },
-  title: { fontSize: 28, fontWeight: '800', color: '#111827' },
-  subtitle: { marginTop: 8, color: '#667085' },
-})
+import { useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { router } from 'expo-router'
+import { getStudentId, formatBRDate } from '@/lib/student'
+import { supabase } from '@/lib/supabase'
+type Activity={id:string;titulo:string;descricao:string|null;idioma:string;status:string;prazo:string|null;nota:number|null}
+export default function AtividadesScreen(){const[items,setItems]=useState<Activity[]>([]);const[loading,setLoading]=useState(true);const[refreshing,setRefreshing]=useState(false);const[error,setError]=useState('');const load=useCallback(async()=>{try{setError('');const id=await getStudentId();const{data,error:e}=await supabase.from('atividades').select('id,titulo,descricao,idioma,status,prazo,nota').eq('aluno_id',id).neq('status','rascunho').order('created_at',{ascending:false});if(e)throw e;setItems(data??[])}catch(e){setError(e instanceof Error?e.message:'Não foi possível carregar suas atividades.')}finally{setLoading(false);setRefreshing(false)}},[]);useEffect(()=>{void load()},[load]);if(loading)return<View style={styles.loading}><ActivityIndicator size="large"/></View>;return<ScrollView style={styles.container} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>{setRefreshing(true);void load()}}/>}><Text style={styles.eyebrow}>ATIVIDADES</Text><Text style={styles.title}>Minhas atividades</Text><Text style={styles.subtitle}>Acompanhe atividades disponíveis, respostas e notas.</Text>{error?<View style={styles.error}><Text style={styles.errorText}>{error}</Text></View>:null}{items.length===0?<View style={styles.empty}><Text style={styles.emptyTitle}>Nenhuma atividade disponível</Text><Text style={styles.emptyText}>Quando seu professor enviar uma atividade, ela aparecerá aqui.</Text></View>:items.map(item=><Pressable key={item.id} style={styles.card} onPress={()=>router.push({pathname:'/(student)/atividade/[id]',params:{id:item.id}})}><Text style={styles.language}>{item.idioma==='ingles'?'Inglês':'Alemão'}</Text><Text style={styles.cardTitle}>{item.titulo}</Text>{item.descricao?<Text style={styles.description} numberOfLines={3}>{item.descricao}</Text>:null}<View style={styles.row}><Text style={styles.status}>{item.status}</Text>{item.prazo?<Text style={styles.meta}>Prazo: {formatBRDate(item.prazo)}</Text>:null}</View>{item.nota!==null?<Text style={styles.grade}>Nota: {item.nota}</Text>:null}</Pressable>)}</ScrollView>}
+const styles=StyleSheet.create({loading:{flex:1,alignItems:'center',justifyContent:'center',backgroundColor:'#f6f7fb'},container:{flex:1,backgroundColor:'#f6f7fb'},content:{padding:24,paddingTop:52,paddingBottom:36},eyebrow:{fontSize:12,fontWeight:'800',letterSpacing:1.2,color:'#667085'},title:{fontSize:30,fontWeight:'800',color:'#111827',marginTop:8},subtitle:{fontSize:15,color:'#667085',marginTop:6,marginBottom:20},card:{backgroundColor:'#fff',borderRadius:20,padding:20,marginBottom:12},language:{fontSize:11,fontWeight:'800',letterSpacing:1,color:'#667085'},cardTitle:{fontSize:19,fontWeight:'800',color:'#111827',marginTop:6},description:{fontSize:14,lineHeight:20,color:'#667085',marginTop:8},row:{flexDirection:'row',justifyContent:'space-between',gap:12,marginTop:16},status:{fontSize:12,fontWeight:'800',color:'#344054'},meta:{fontSize:12,color:'#667085'},grade:{marginTop:10,fontWeight:'800',color:'#111827'},empty:{backgroundColor:'#fff',borderRadius:20,padding:24},emptyTitle:{fontSize:18,fontWeight:'800',color:'#111827'},emptyText:{marginTop:8,color:'#667085',lineHeight:21},error:{backgroundColor:'#fff1f2',borderRadius:14,padding:14,marginBottom:12},errorText:{color:'#be123c',lineHeight:19}})
