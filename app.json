@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "scheme": "abacademy",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "plugins": [
       "expo-router",
       "expo-sqlite",
