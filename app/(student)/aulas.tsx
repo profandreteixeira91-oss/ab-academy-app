@@ -1,16 +1,284 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 import { router } from 'expo-router'
-import { canEnterLesson, getNextLessonOccurrence, getStudentId, formatBRDate } from '@/lib/student'
+import {
+  canEnterLesson,
+  formatBRDate,
+  getNextLessonOccurrence,
+  getStudentId,
+} from '@/lib/student'
 import { supabase } from '@/lib/supabase'
 
-type Lesson = { id: string; language: string; date: string; time: string; teacher: string; startAt: string; endAt: string; meetUrl?: string }
+type Lesson = {
+  id: string
+  language: string
+  date: string
+  time: string
+  teacher: string
+  startAt: string
+  endAt: string
+  meetUrl?: string
+}
 
 export default function AulasScreen() {
- const [lessons,setLessons]=useState<Lesson[]>([]); const [loading,setLoading]=useState(true); const [refreshing,setRefreshing]=useState(false); const [error,setError]=useState('')
- const load=useCallback(async()=>{try{setError('');const studentId=await getStudentId();const{data,error:queryError}=await supabase.from('horarios').select('id, idioma, dia_semana, hora_inicio, hora_fim, professor_id, meet_url').eq('aluno_id',studentId);if(queryError)throw queryError;const ids=Array.from(new Set((data??[]).map(x=>x.professor_id).filter(Boolean)));const{data:professors,error:professorError}=ids.length?await supabase.from('professores').select('id,nome_completo').in('id',ids):{data:[],error:null};if(professorError)throw professorError;const map=new Map((professors??[]).map(x=>[x.id,x.nome_completo]));setLessons((data??[]).map(x=>{const{startAt,endAt}=getNextLessonOccurrence(Number(x.dia_semana),x.hora_inicio,x.hora_fim);return{id:x.id,language:x.idioma==='ingles'?'Inglês':'Alemão',date:formatBRDate(startAt.toISOString()),time:x.hora_inicio.slice(0,5),teacher:map.get(x.professor_id)||'Professor',startAt:startAt.toISOString(),endAt:endAt.toISOString(),meetUrl:x.meet_url||undefined}}).sort((a,b)=>new Date(a.startAt).getTime()-new Date(b.startAt).getTime()))}catch(err){setError(err instanceof Error?err.message:'Não foi possível carregar suas aulas.')}finally{setLoading(false);setRefreshing(false)}},[])
- useEffect(()=>{void load()},[load])
- if(loading)return <View style={styles.loading}><ActivityIndicator size="large"/></View>
- return <ScrollView style={styles.container} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>{setRefreshing(true);void load()}}}><Text style={styles.eyebrow}>AGENDA</Text><Text style={styles.title}>Minhas aulas</Text><Text style={styles.subtitle}>Sua programação semanal.</Text>{error?<View style={styles.error}><Text style={styles.errorText}>{error}</Text></View>:null}{lessons.length===0?<View style={styles.empty}><Text style={styles.emptyTitle}>Nenhuma aula agendada</Text><Text style={styles.emptyText}>Quando uma aula for agendada para você, ela aparecerá aqui.</Text></View>:lessons.map(lesson=>{const ready=canEnterLesson(lesson.startAt,lesson.endAt);return <View key={lesson.id} style={styles.card}><Text style={styles.language}>{lesson.language}</Text><Text style={styles.date}>{lesson.date} • {lesson.time}</Text><Text style={styles.teacher}>{lesson.teacher}</Text><Pressable style={[styles.button,!ready&&styles.buttonDisabled]} disabled={!ready} onPress={()=>router.push({pathname:'/(student)/aula/[id]',params:{id:lesson.id}})}><Text style={styles.buttonText}>{ready?'Entrar na aula':'Acesso 5 min antes'}</Text></Pressable></View>})}</ScrollView>
+  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    try {
+      setError('')
+
+      const studentId = await getStudentId()
+
+      const { data, error: queryError } = await supabase
+        .from('horarios')
+        .select(
+          'id, idioma, dia_semana, hora_inicio, hora_fim, professor_id, meet_url',
+        )
+        .eq('aluno_id', studentId)
+
+      if (queryError) throw queryError
+
+      const ids = Array.from(
+        new Set((data ?? []).map((item) => item.professor_id).filter(Boolean)),
+      )
+
+      const { data: professors, error: professorError } = ids.length
+        ? await supabase
+            .from('professores')
+            .select('id, nome_completo')
+            .in('id', ids)
+        : { data: [], error: null }
+
+      if (professorError) throw professorError
+
+      const professorMap = new Map(
+        (professors ?? []).map((professor) => [
+          professor.id,
+          professor.nome_completo,
+        ]),
+      )
+
+      const mappedLessons = (data ?? [])
+        .map((item) => {
+          const { startAt, endAt } = getNextLessonOccurrence(
+            Number(item.dia_semana),
+            item.hora_inicio,
+            item.hora_fim,
+          )
+
+          return {
+            id: item.id,
+            language: item.idioma === 'ingles' ? 'Inglês' : 'Alemão',
+            date: formatBRDate(startAt.toISOString()),
+            time: item.hora_inicio.slice(0, 5),
+            teacher: professorMap.get(item.professor_id) || 'Professor',
+            startAt: startAt.toISOString(),
+            endAt: endAt.toISOString(),
+            meetUrl: item.meet_url || undefined,
+          }
+        })
+        .sort(
+          (a, b) =>
+            new Date(a.startAt).getTime() - new Date(b.startAt).getTime(),
+        )
+
+      setLessons(mappedLessons)
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível carregar suas aulas.',
+      )
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  if (loading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => {
+            setRefreshing(true)
+            load()
+          }}
+        />
+      }
+    >
+      <Text style={styles.eyebrow}>AGENDA</Text>
+      <Text style={styles.title}>Minhas aulas</Text>
+      <Text style={styles.subtitle}>Sua programação semanal.</Text>
+
+      {error ? (
+        <View style={styles.error}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : null}
+
+      {lessons.length === 0 ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyTitle}>Nenhuma aula agendada</Text>
+          <Text style={styles.emptyText}>
+            Quando uma aula for agendada para você, ela aparecerá aqui.
+          </Text>
+        </View>
+      ) : (
+        lessons.map((lesson) => {
+          const ready = canEnterLesson(lesson.startAt, lesson.endAt)
+
+          return (
+            <View key={lesson.id} style={styles.card}>
+              <Text style={styles.language}>{lesson.language}</Text>
+              <Text style={styles.date}>
+                {lesson.date} • {lesson.time}
+              </Text>
+              <Text style={styles.teacher}>{lesson.teacher}</Text>
+
+              <Pressable
+                style={[
+                  styles.button,
+                  !ready && styles.buttonDisabled,
+                ]}
+                disabled={!ready}
+                onPress={() =>
+                  router.push({
+                    pathname: '/(student)/aula/[id]',
+                    params: { id: lesson.id },
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>
+                  {ready ? 'Entrar na aula' : 'Acesso 5 min antes'}
+                </Text>
+              </Pressable>
+            </View>
+          )
+        })
+      )}
+    </ScrollView>
+  )
 }
-const styles=StyleSheet.create({loading:{flex:1,alignItems:'center',justifyContent:'center',backgroundColor:'#f6f7fb'},container:{flex:1,backgroundColor:'#f6f7fb'},content:{padding:24,paddingTop:52,paddingBottom:36},eyebrow:{fontSize:12,fontWeight:'800',letterSpacing:1.2,color:'#667085'},title:{fontSize:30,fontWeight:'800',color:'#111827',marginTop:8},subtitle:{fontSize:15,color:'#667085',marginTop:6,marginBottom:20},card:{backgroundColor:'#fff',borderRadius:20,padding:20,marginBottom:12},language:{fontSize:18,fontWeight:'800',color:'#111827'},date:{fontSize:15,color:'#475467',marginTop:8},teacher:{fontSize:14,color:'#667085',marginTop:5},button:{height:48,marginTop:16,borderRadius:13,backgroundColor:'#111827',alignItems:'center',justifyContent:'center'},buttonDisabled:{opacity:.45},buttonText:{color:'#fff',fontWeight:'700'},empty:{backgroundColor:'#fff',borderRadius:20,padding:24},emptyTitle:{fontSize:18,fontWeight:'800',color:'#111827'},emptyText:{marginTop:8,color:'#667085',lineHeight:21},error:{backgroundColor:'#fff1f2',borderRadius:14,padding:14,marginBottom:12},errorText:{color:'#be123c',lineHeight:19}})
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f6f7fb',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#f6f7fb',
+  },
+  content: {
+    padding: 24,
+    paddingTop: 52,
+    paddingBottom: 36,
+  },
+  eyebrow: {
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    color: '#667085',
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#111827',
+    marginTop: 8,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#667085',
+    marginTop: 6,
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 12,
+  },
+  language: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  date: {
+    fontSize: 15,
+    color: '#475467',
+    marginTop: 8,
+  },
+  teacher: {
+    fontSize: 14,
+    color: '#667085',
+    marginTop: 5,
+  },
+  button: {
+    height: 48,
+    marginTop: 16,
+    borderRadius: 13,
+    backgroundColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.45,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  empty: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  emptyText: {
+    marginTop: 8,
+    color: '#667085',
+    lineHeight: 21,
+  },
+  error: {
+    backgroundColor: '#fff1f2',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+  },
+  errorText: {
+    color: '#be123c',
+    lineHeight: 19,
+  },
+})
