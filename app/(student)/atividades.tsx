@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...typography.overline,
-    color: '#AAB2C0',
+    color: 'rgba(255,255,255,0.78)',
   },
   summaryTitle: {
     ...typography.h2,
@@ -357,13 +357,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 6,
     borderRadius: radius.pill,
-    backgroundColor: '#293241',
+    backgroundColor: 'rgba(255,255,255,0.12)',
   },
   summaryBadgeText: {
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.8,
-    color: '#D0D5DD',
+    color: 'rgba(255,255,255,0.88)',
   },
   summaryStats: {
     flexDirection: 'row',
@@ -381,13 +381,13 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     ...typography.caption,
-    color: '#AAB2C0',
+    color: 'rgba(255,255,255,0.78)',
     marginTop: 3,
   },
   statDivider: {
     width: 1,
     height: 34,
-    backgroundColor: '#3B4351',
+    backgroundColor: 'rgba(255,255,255,0.18)',
     marginHorizontal: spacing.md,
   },
   error: {
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.xl,
     marginBottom: spacing.md,
-    shadowColor: '#101828',
+    shadowColor: colors.primary,
     shadowOpacity: 0.045,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 5 },
