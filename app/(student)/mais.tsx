@@ -1,16 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native'
-
-export default function MoreScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Mais</Text>
-      <Text style={styles.subtitle}>Solicitações, perfil e outras opções.</Text>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f6f7fb', padding: 24, paddingTop: 64 },
-  title: { fontSize: 28, fontWeight: '800', color: '#111827' },
-  subtitle: { marginTop: 8, color: '#667085' },
-})
+import { useEffect, useState } from 'react'
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
+import { router } from 'expo-router'
+import { getStudentIdentity } from '@/lib/student'
+import { supabase } from '@/lib/supabase'
+export default function MoreScreen(){const[name,setName]=useState('Aluno');const[email,setEmail]=useState('');useEffect(()=>{getStudentIdentity().then(x=>{setName(x.name);setEmail(x.user.email||'')}).catch(()=>undefined)},[]);async function signOut(){const{error}=await supabase.auth.signOut();if(error)Alert.alert('Sair',error.message);else router.replace('/(auth)/login')}return<View style={styles.container}><Text style={styles.eyebrow}>CONTA</Text><Text style={styles.title}>Mais</Text><View style={styles.card}><Text style={styles.name}>{name}</Text><Text style={styles.email}>{email}</Text></View><Pressable style={styles.item} onPress={()=>Alert.alert('Perfil','A tela de perfil será integrada na próxima etapa.')}><Text style={styles.itemText}>Meu perfil</Text></Pressable><Pressable style={styles.item} onPress={()=>Alert.alert('Solicitações','O atendimento será integrado na próxima etapa.')}><Text style={styles.itemText}>Minhas solicitações</Text></Pressable><Pressable style={styles.logout} onPress={()=>void signOut()}><Text style={styles.logoutText}>Sair da conta</Text></Pressable></View>}
+const styles=StyleSheet.create({container:{flex:1,backgroundColor:'#f6f7fb',padding:24,paddingTop:52},eyebrow:{fontSize:12,fontWeight:'800',letterSpacing:1.2,color:'#667085'},title:{fontSize:30,fontWeight:'800',color:'#111827',marginTop:8},card:{backgroundColor:'#fff',borderRadius:20,padding:20,marginTop:20},name:{fontSize:19,fontWeight:'800',color:'#111827'},email:{marginTop:5,color:'#667085'},item:{backgroundColor:'#fff',borderRadius:16,padding:18,marginTop:10},itemText:{color:'#111827',fontWeight:'700'},logout:{marginTop:22,height:50,borderRadius:14,borderWidth:1,borderColor:'#d0d5dd',alignItems:'center',justifyContent:'center'},logoutText:{color:'#b42318',fontWeight:'800'}})
