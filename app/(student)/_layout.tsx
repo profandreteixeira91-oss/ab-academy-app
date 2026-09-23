@@ -119,6 +119,14 @@ export default function StudentLayout() {
         }}
       />
       <Tabs.Screen
+        name="central"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="central/atividade/[id]"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
         name="atividade/[id]"
         options={{ href: null }}
       />
