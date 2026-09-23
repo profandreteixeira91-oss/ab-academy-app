@@ -40,15 +40,9 @@ export default function MoreScreen() {
     >
       <View style={styles.header}>
         <View style={styles.headerCopy}>
-          <Text style={styles.eyebrow}>CONTA</Text>
+          <Text style={styles.eyebrow}>AB ACADEMY</Text>
           <Text style={styles.title}>Mais</Text>
-          <Text style={styles.subtitle}>
-            Seu perfil e opções da plataforma.
-          </Text>
-        </View>
-
-        <View style={styles.headerIcon}>
-          <Text style={styles.headerIconText}>•••</Text>
+          <Text style={styles.subtitle}>Perfil, suporte e configurações.</Text>
         </View>
       </View>
 
@@ -60,12 +54,16 @@ export default function MoreScreen() {
 
           <View style={styles.profileCopy}>
             <Text style={styles.profileLabel}>ALUNO</Text>
-            <Text style={styles.name}>{name}</Text>
-            <Text style={styles.email}>{email || 'Conta AB Academy'}</Text>
+            <Text style={styles.name} numberOfLines={1}>{name}</Text>
+            <Text style={styles.email} numberOfLines={1}>
+              {email || 'Conta AB Academy'}
+            </Text>
+          </View>
+
+          <View style={styles.profileBadge}>
+            <Text style={styles.profileBadgeText}>ATIVO</Text>
           </View>
         </View>
-
-        <View style={styles.profileDivider} />
 
         <Pressable
           style={({ pressed }) => [styles.profileAction, pressed && styles.pressed]}
@@ -82,9 +80,7 @@ export default function MoreScreen() {
 
           <View style={styles.actionCopy}>
             <Text style={styles.actionTitle}>Meu perfil</Text>
-            <Text style={styles.actionSubtitle}>
-              Consulte seus dados cadastrais.
-            </Text>
+            <Text style={styles.actionSubtitle}>Consultar dados cadastrais</Text>
           </View>
 
           <Text style={styles.chevron}>›</Text>
@@ -103,15 +99,13 @@ export default function MoreScreen() {
             )
           }
         >
-          <View style={[styles.menuIcon, { backgroundColor: colors.primarySoft }]}>
+          <View style={styles.menuIcon}>
             <Text style={styles.menuIconText}>?</Text>
           </View>
 
           <View style={styles.menuCopy}>
             <Text style={styles.menuTitle}>Minhas solicitações</Text>
-            <Text style={styles.menuSubtitle}>
-              Acompanhe pedidos e atendimentos.
-            </Text>
+            <Text style={styles.menuSubtitle}>Pedidos e atendimentos</Text>
           </View>
 
           <Text style={styles.chevron}>›</Text>
@@ -127,7 +121,11 @@ export default function MoreScreen() {
         <View style={styles.logoutIcon}>
           <Text style={styles.logoutIconText}>↪</Text>
         </View>
-        <Text style={styles.logoutText}>Sair da conta</Text>
+        <View style={styles.logoutCopy}>
+          <Text style={styles.logoutText}>Sair da conta</Text>
+          <Text style={styles.logoutSubtitle}>Encerrar sua sessão neste dispositivo</Text>
+        </View>
+        <Text style={styles.logoutChevron}>›</Text>
       </Pressable>
 
       <Text style={styles.version}>AB Academy • Portal do Aluno</Text>
@@ -141,71 +139,55 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
-    padding: spacing.xxl,
-    paddingTop: 42,
-    paddingBottom: 36,
+    paddingHorizontal: spacing.xxl,
+    paddingTop: 34,
+    paddingBottom: 38,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xxl,
+    marginBottom: spacing.xl,
   },
   headerCopy: {
     flex: 1,
-    paddingRight: spacing.lg,
   },
   eyebrow: {
     ...typography.overline,
-    color: colors.textSecondary,
+    color: colors.primary,
   },
   title: {
     ...typography.h1,
     color: colors.text,
-    marginTop: 6,
+    marginTop: 4,
   },
   subtitle: {
     ...typography.body,
     color: colors.textSecondary,
-    marginTop: 6,
-  },
-  headerIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerIconText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 2,
+    marginTop: 5,
   },
   profileCard: {
-    marginBottom: spacing.xxl,
+    padding: 18,
+    marginBottom: 28,
   },
   profileTop: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   avatar: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.lg,
+    marginRight: spacing.md,
   },
   avatarText: {
     color: colors.white,
-    fontSize: 24,
+    fontSize: 23,
     fontWeight: '800',
   },
   profileCopy: {
     flex: 1,
+    minWidth: 0,
   },
   profileLabel: {
     ...typography.overline,
@@ -215,33 +197,45 @@ const styles = StyleSheet.create({
   name: {
     ...typography.h3,
     color: colors.text,
-    marginTop: 2,
+    marginTop: 1,
   },
   email: {
     ...typography.caption,
     color: colors.textSecondary,
-    marginTop: 3,
+    marginTop: 2,
   },
-  profileDivider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: spacing.lg,
+  profileBadge: {
+    backgroundColor: colors.successSoft,
+    borderRadius: radius.pill,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    marginLeft: spacing.sm,
+  },
+  profileBadgeText: {
+    color: colors.success,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   profileAction: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
   },
   actionIcon: {
     width: 38,
     height: 38,
-    borderRadius: radius.sm,
+    borderRadius: 12,
     backgroundColor: colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
   },
   actionIconText: {
-    color: colors.text,
+    color: colors.primary,
     fontSize: 17,
     fontWeight: '800',
   },
@@ -260,13 +254,14 @@ const styles = StyleSheet.create({
   chevron: {
     fontSize: 28,
     lineHeight: 30,
-    color: colors.textTertiary,
+    color: colors.borderStrong,
     marginLeft: spacing.sm,
   },
   sectionTitle: {
-    ...typography.h3,
-    color: colors.text,
-    marginBottom: spacing.md,
+    ...typography.overline,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+    marginLeft: 2,
   },
   menuCard: {
     backgroundColor: colors.surface,
@@ -274,7 +269,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radius.lg,
     paddingHorizontal: spacing.lg,
-    marginBottom: spacing.xxl,
+    marginBottom: 26,
+    overflow: 'hidden',
   },
   menuItem: {
     minHeight: 76,
@@ -282,17 +278,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.sm,
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
   },
   menuIconText: {
-    fontSize: 17,
+    color: colors.white,
+    fontSize: 18,
     fontWeight: '800',
-    color: colors.text,
   },
   menuCopy: {
     flex: 1,
@@ -307,33 +304,46 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   logout: {
-    minHeight: 56,
-    borderRadius: radius.md,
+    minHeight: 68,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.borderStrong,
+    borderColor: '#F3C7C4',
     backgroundColor: colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
   },
   logoutIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.white,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: colors.dangerSoft,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.sm,
+    marginRight: spacing.md,
   },
   logoutIconText: {
     color: colors.danger,
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '800',
+  },
+  logoutCopy: {
+    flex: 1,
   },
   logoutText: {
     ...typography.bodyMedium,
     color: colors.danger,
+  },
+  logoutSubtitle: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 1,
+  },
+  logoutChevron: {
+    fontSize: 28,
+    lineHeight: 30,
+    color: '#E49B96',
+    marginLeft: spacing.sm,
   },
   version: {
     ...typography.caption,
