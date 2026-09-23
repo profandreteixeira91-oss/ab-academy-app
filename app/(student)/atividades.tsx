@@ -62,6 +62,7 @@ function getLanguageLabel(idioma: string) {
 
 export default function AtividadesScreen() {
   const [items, setItems] = useState<Activity[]>([])
+  const [filter, setFilter] = useState<'todas' | 'pendentes' | 'andamento' | 'concluidas'>('todas')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
@@ -108,6 +109,24 @@ export default function AtividadesScreen() {
     [items]
   )
 
+  const inProgressCount = useMemo(
+    () => items.filter((item) => item.status === 'em_andamento').length,
+    [items]
+  )
+
+  const filteredItems = useMemo(() => {
+    switch (filter) {
+      case 'pendentes':
+        return items.filter((item) => item.status === 'enviada')
+      case 'andamento':
+        return items.filter((item) => item.status === 'em_andamento')
+      case 'concluidas':
+        return items.filter((item) => ['respondida', 'em_correcao', 'corrigida'].includes(item.status))
+      default:
+        return items
+    }
+  }, [filter, items])
+
   if (loading) {
     return (
       <View style={styles.loading}>
@@ -134,10 +153,10 @@ export default function AtividadesScreen() {
     >
       <View style={styles.header}>
         <View style={styles.headerCopy}>
-          <Text style={styles.eyebrow}>ATIVIDADES</Text>
-          <Text style={styles.title}>Meu aprendizado</Text>
+          <Text style={styles.eyebrow}>CENTRAL DE ATIVIDADES</Text>
+          <Text style={styles.title}>Seu aprendizado</Text>
           <Text style={styles.subtitle}>
-            Acompanhe suas atividades, respostas e resultados.
+            Encontre rapidamente o que precisa responder, continuar ou revisar.
           </Text>
         </View>
 
@@ -190,11 +209,35 @@ export default function AtividadesScreen() {
 
       <View style={styles.sectionHeader}>
         <View>
-          <Text style={styles.sectionTitle}>Suas atividades</Text>
+          <Text style={styles.sectionTitle}>Atividades</Text>
           <Text style={styles.sectionSubtitle}>
-            Selecione uma atividade para continuar.
+            Filtre por etapa e continue de onde parou.
           </Text>
         </View>
+      </View>
+
+      <View style={styles.filters}>
+        {([
+          ['todas', 'Todas', items.length],
+          ['pendentes', 'Pendentes', pendingCount],
+          ['andamento', 'Em andamento', inProgressCount],
+          ['concluidas', 'Concluídas', correctedCount],
+        ] as const).map(([value, label, count]) => (
+          <Pressable
+            key={value}
+            onPress={() => setFilter(value)}
+            style={[styles.filterChip, filter === value && styles.filterChipActive]}
+          >
+            <Text style={[styles.filterText, filter === value && styles.filterTextActive]}>
+              {label}
+            </Text>
+            <View style={[styles.filterCount, filter === value && styles.filterCountActive]}>
+              <Text style={[styles.filterCountText, filter === value && styles.filterCountTextActive]}>
+                {count}
+              </Text>
+            </View>
+          </Pressable>
+        ))}
       </View>
 
       {items.length === 0 ? (
@@ -207,8 +250,18 @@ export default function AtividadesScreen() {
             Quando seu professor enviar uma atividade, ela aparecerá aqui.
           </Text>
         </AppCard>
+      ) : filteredItems.length === 0 ? (
+        <AppCard style={styles.emptyFilter}>
+          <View style={styles.emptyFilterIcon}>
+            <Text style={styles.emptyFilterIconText}>✓</Text>
+          </View>
+          <Text style={styles.emptyFilterTitle}>Nada nesta categoria</Text>
+          <Text style={styles.emptyFilterText}>
+            Não há atividades para o filtro selecionado no momento.
+          </Text>
+        </AppCard>
       ) : (
-        items.map((item) => {
+        filteredItems.map((item) => {
           const status = getStatusStyle(item.status)
 
           return (
@@ -419,6 +472,54 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 2,
   },
+  filters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 40,
+    paddingLeft: 13,
+    paddingRight: 7,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  filterChipActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
+  },
+  filterText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+  },
+  filterTextActive: {
+    color: colors.white,
+  },
+  filterCount: {
+    minWidth: 24,
+    height: 24,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primarySoft,
+    marginLeft: 7,
+  },
+  filterCountActive: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+  },
+  filterCountText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  filterCountTextActive: {
+    color: colors.white,
+  },
   activityCard: {
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -562,5 +663,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.sm,
     maxWidth: 300,
+  },
+  emptyFilter: {
+    alignItems: 'center',
+    paddingVertical: 28,
+  },
+  emptyFilterIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  emptyFilterIconText: {
+    color: colors.primary,
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  emptyFilterTitle: {
+    ...typography.bodyMedium,
+    color: colors.text,
+  },
+  emptyFilterText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 4,
   },
 })
