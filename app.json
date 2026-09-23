@@ -9,7 +9,9 @@
     "newArchEnabled": true,
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      "@livekit/react-native-expo-plugin",
+      "@config-plugins/react-native-webrtc"
     ],
     "ios": {
       "supportsTablet": true,
