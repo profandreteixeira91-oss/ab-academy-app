@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import { AudioSession, LiveKitRoom, VideoTrack, isTrackReference, useLocalParticipant, useParticipants, useTracks } from '@livekit/react-native'
+import { AudioSession, LiveKitRoom, VideoTrack, isTrackReference, useLocalParticipant, useParticipants, useRoomContext, useTracks } from '@livekit/react-native'
 import { Track, RoomEvent } from 'livekit-client'
 import { colors, radius, spacing, typography } from '@/constants/theme'
 import { AppCard } from '@/components/AppCard'
@@ -8,7 +8,19 @@ import { AppCard } from '@/components/AppCard'
 type Lesson = { id: string; idioma: 'ingles' | 'alemao'; dia_semana: number; hora_inicio: string; hora_fim: string; disponivel: boolean }
 type LiveKitData = { token: string; url: string; roomName: string; identity: string; name: string }
 
+type ChatMessage = {
+  id: string
+  sender: string
+  message: string
+  mine: boolean
+}
+
+function languageName(language: string) {
+  return language === 'ingles' ? 'Inglês' : 'Alemão'
+}
+
 function RoomContent({ lesson, onLeave }: { lesson: Lesson; onLeave: () => void }) {
+  const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
   const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }])
@@ -21,7 +33,6 @@ function RoomContent({ lesson, onLeave }: { lesson: Lesson; onLeave: () => void 
   }, [])
 
   useEffect(() => {
-    const room = localParticipant.room
     const handleData = (payload: Uint8Array, participant: { identity: string; name?: string }, _kind: unknown, topic?: string) => {
       if (topic !== 'chat') return
       try {
@@ -98,12 +109,12 @@ function RoomContent({ lesson, onLeave }: { lesson: Lesson; onLeave: () => void 
   )
 }
 
-function ConnectedRoom({ livekit, lesson, onLeave }: { livekit: LiveKitData; lesson: Lesson; onLeave: () => void }) {
+export function LiveKitClassroom({ livekit, lesson, onLeave }: { livekit: LiveKitData; lesson: Lesson; onLeave: () => void }) {
   const [connected, setConnected] = useState(false)
   const [roomError, setRoomError] = useState('')
   return (
     <View style={styles.roomWrapper}>
-      <LiveKitRoom serverUrl={livekit.url} token={livekit.token} connect audio video options={{ adaptiveStream: { pixelDensity: 'screen' } }} onConnected={() => { setRoomError(''); setConnected(true) }} onDisconnected={() => setConnected(false)} onError={(error) => setRoomError(error.message || 'Não foi possível conectar à sala.')} style={styles.liveKitRoom}>
+      <LiveKitRoom serverUrl={livekit.url} token={livekit.token} connect audio video options={{ adaptiveStream: { pixelDensity: 'screen' } }} onConnected={() => { setRoomError(''); setConnected(true) }} onDisconnected={() => setConnected(false)} onError={(error) => setRoomError(error.message || 'Não foi possível conectar à sala.')}>
         <RoomContent lesson={lesson} onLeave={onLeave} />
         {!connected && !roomError ? <View style={styles.connectionOverlay}><ActivityIndicator size="small" color={colors.white} /><Text style={styles.connectionText}>Conectando à sala...</Text></View> : null}
         {roomError ? <View style={styles.connectionOverlay}><Text style={styles.connectionErrorTitle}>Não foi possível conectar</Text><Text style={styles.connectionErrorText}>{roomError}</Text><Pressable style={styles.retryButton} onPress={onLeave}><Text style={styles.retryButtonText}>Voltar</Text></Pressable></View> : null}
@@ -141,7 +152,6 @@ const styles = StyleSheet.create({
   enterButtonText: { color: colors.white, fontSize: 15, fontWeight: '800' },
   accessMessage: { ...typography.caption, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.md },
   roomWrapper: { flex: 1, backgroundColor: '#090B10' },
-  liveKitRoom: { flex: 1 },
   room: { flex: 1, backgroundColor: '#090B10' },
   roomHeader: { minHeight: 74, paddingHorizontal: spacing.lg, paddingTop: 14, paddingBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#10131A', borderBottomWidth: 1, borderBottomColor: '#252A34' },
   brandBlock: { flex: 1 },
@@ -201,7 +211,7 @@ const styles = StyleSheet.create({
   sendButton: { height: 46, paddingHorizontal: 14, borderRadius: radius.md, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginLeft: spacing.sm },
   sendButtonDisabled: { backgroundColor: colors.borderStrong },
   sendButtonText: { color: colors.white, fontSize: 11, fontWeight: '800' },
-  connectionOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(9,11,16,0.92)', alignItems: 'center', justifyContent: 'center', padding: spacing.xxl },
+  connectionOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(9,11,16,0.92)', alignItems: 'center', justifyContent: 'center', padding: spacing.xxl },
   connectionText: { ...typography.bodyMedium, color: colors.white, marginTop: spacing.md },
   connectionErrorTitle: { ...typography.h3, color: colors.white, textAlign: 'center' },
   connectionErrorText: { ...typography.body, color: '#D0D5DD', textAlign: 'center', marginTop: spacing.sm },
