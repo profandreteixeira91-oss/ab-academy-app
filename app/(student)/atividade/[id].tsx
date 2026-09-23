@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     ...typography.overline,
-    color: '#AAB2C0',
+    color: 'rgba(255,255,255,0.78)',
   },
   progressTitle: {
     ...typography.bodyMedium,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 7,
     borderRadius: radius.pill,
-    backgroundColor: '#343B48',
+    backgroundColor: 'rgba(255,255,255,0.18)',
     overflow: 'hidden',
     marginTop: spacing.xl,
   },
