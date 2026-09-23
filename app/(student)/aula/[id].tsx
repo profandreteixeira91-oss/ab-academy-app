@@ -149,14 +149,41 @@ export default function LessonRoomScreen() {
   }, [id])
 
   async function enterRoom() {
-    if (!lesson || !allowed) return
+    if (!lesson) return
+
     try {
-      setConnecting(true); setError('')
-      const { data, error: functionError } = await supabase.functions.invoke('livekit-token', { body: { lessonId: lesson.id } })
-      if (functionError) throw functionError
-      if (!data?.token || !data?.url) throw new Error(data?.error || 'Não foi possível obter acesso à sala virtual.')
+      setConnecting(true)
+      setError('')
+
+      console.log('[AB ACADEMY] CHAMANDO livekit-token', {
+        lessonId: lesson.id,
+        allowed,
+      })
+
+      const { data, error: functionError } = await supabase.functions.invoke('livekit-token', {
+        body: { lessonId: lesson.id },
+      })
+
+      console.log('[AB ACADEMY] RESPOSTA livekit-token', {
+        data,
+        error: functionError,
+      })
+
+      if (functionError) {
+        throw new Error(functionError.message || 'Erro ao chamar a função livekit-token.')
+      }
+
+      if (!data?.token || !data?.url) {
+        throw new Error(data?.error || 'A função livekit-token não retornou os dados da sala.')
+      }
+
       setLivekit(data)
-    } catch (err) { setError(err instanceof Error ? err.message : 'Não foi possível conectar à sala.') } finally { setConnecting(false) }
+    } catch (err) {
+      console.error('[AB ACADEMY] ERRO livekit-token', err)
+      setError(err instanceof Error ? err.message : 'Não foi possível conectar à sala.')
+    } finally {
+      setConnecting(false)
+    }
   }
 
   if (loading) return <View style={styles.center}><ActivityIndicator size="small" color={colors.primary} /><Text style={styles.loadingText}>Carregando sala de aula...</Text></View>
@@ -171,7 +198,7 @@ export default function LessonRoomScreen() {
         <View style={styles.preRoomIcon}><Text style={styles.preRoomIconText}>▶</Text></View>
         <Text style={styles.preRoomLabel}>AB ACADEMY LIVE</Text><Text style={styles.preRoomTitle}>Sala de videoconferência</Text><Text style={styles.preRoomDescription}>Vídeo, áudio, participantes e chat em uma única sala.</Text>
         <View style={styles.lessonInfo}><View style={styles.lessonInfoItem}><Text style={styles.lessonInfoLabel}>HORÁRIO</Text><Text style={styles.lessonInfoValue}>{formatTime(lesson.hora_inicio)} — {formatTime(lesson.hora_fim)}</Text></View><View style={styles.lessonInfoItem}><Text style={styles.lessonInfoLabel}>IDIOMA</Text><Text style={styles.lessonInfoValue}>{languageName(lesson.idioma)}</Text></View></View>
-        <Pressable style={[styles.enterButton, (!allowed || connecting) && styles.enterButtonDisabled]} onPress={() => void enterRoom()} disabled={!allowed || connecting}>{connecting ? <ActivityIndicator size="small" color={colors.white} /> : <Text style={styles.enterButtonText}>{allowed ? 'Entrar na aula' : 'Acesso ainda não liberado'}</Text>}</Pressable>
+        <Pressable style={[styles.enterButton, connecting && styles.enterButtonDisabled]} onPress={() => void enterRoom()} disabled={connecting}>{connecting ? <ActivityIndicator size="small" color={colors.white} /> : <Text style={styles.enterButtonText}>{allowed ? 'Entrar na aula' : 'Testar acesso à sala'}</Text>}</Pressable>
         <Text style={styles.accessMessage}>{allowed ? 'A sala está disponível agora.' : message || 'O acesso será liberado 5 minutos antes.'}</Text>
       </AppCard> : null}
     </ScrollView>
