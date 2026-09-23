@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import { router } from 'expo-router'
 import { supabase } from '@/lib/supabase'
+import { colors } from '@/constants/theme'
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
@@ -68,7 +69,7 @@ export default function LoginScreen() {
         <TextInput
           style={styles.input}
           placeholder="E-mail"
-          placeholderTextColor="#8b93a1"
+          placeholderTextColor={colors.textTertiary}
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
@@ -79,7 +80,7 @@ export default function LoginScreen() {
         <TextInput
           style={styles.input}
           placeholder="Senha"
-          placeholderTextColor="#8b93a1"
+          placeholderTextColor={colors.textTertiary}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -91,7 +92,7 @@ export default function LoginScreen() {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.white} />
           ) : (
             <Text style={styles.buttonText}>Entrar</Text>
           )}
@@ -108,7 +109,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f6f7fb',
+    backgroundColor: colors.background,
     justifyContent: 'center',
     padding: 24,
   },
@@ -116,42 +117,44 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 460,
     alignSelf: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 28,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   brand: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: colors.primary,
     marginBottom: 24,
   },
   title: {
     fontSize: 30,
     fontWeight: '800',
-    color: '#111827',
+    color: colors.text,
   },
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#667085',
+    color: colors.textSecondary,
     marginTop: 8,
     marginBottom: 24,
   },
   input: {
     height: 52,
     borderWidth: 1,
-    borderColor: '#d9dde5',
+    borderColor: colors.borderStrong,
     borderRadius: 14,
     paddingHorizontal: 16,
-    color: '#111827',
+    color: colors.text,
     marginBottom: 12,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   button: {
     height: 52,
     borderRadius: 14,
-    backgroundColor: '#111827',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
@@ -160,13 +163,13 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '700',
   },
   link: {
     textAlign: 'center',
-    color: '#2563eb',
+    color: colors.accent,
     fontSize: 14,
     fontWeight: '600',
     marginTop: 18,
