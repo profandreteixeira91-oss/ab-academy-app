@@ -33,11 +33,12 @@ function RoomContent({ lesson, onLeave }: { lesson: Lesson; onLeave: () => void 
   }, [])
 
   useEffect(() => {
-    const handleData = (payload: Uint8Array, participant: { identity: string; name?: string }, _kind: unknown, topic?: string) => {
+    const handleData = (payload: Uint8Array, participant?: { identity: string; name?: string }, _kind?: unknown, topic?: string) => {
       if (topic !== 'chat') return
       try {
         const parsed = JSON.parse(new TextDecoder().decode(payload)) as { message?: string; id?: string }
         if (!parsed.message) return
+        if (!participant) return
         if (participant.identity === localParticipant.identity) return
         setChat((current) => current.concat({ id: parsed.id || String(Date.now()), sender: participant.name || participant.identity || 'Participante', message: parsed.message as string, mine: false }))
       } catch {
