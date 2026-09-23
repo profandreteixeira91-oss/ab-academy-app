@@ -47,7 +47,7 @@ export default function LessonRoomScreen() {
     if (!livekit || Constants.appOwnership === 'expo') return
     let active = true
     void import('@/components/LiveKitClassroom').then((module) => {
-      if (active) setLiveKitClassroom(() => module.default)
+      if (active) setLiveKitClassroom(() => module.LiveKitClassroom)
     }).catch((err) => {
       if (active) setError(err instanceof Error ? err.message : 'O módulo da sala virtual não está disponível neste dispositivo.')
     })
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   sendButton: { height: 46, paddingHorizontal: 14, borderRadius: radius.md, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginLeft: spacing.sm },
   sendButtonDisabled: { backgroundColor: colors.borderStrong },
   sendButtonText: { color: colors.white, fontSize: 11, fontWeight: '800' },
-  connectionOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(9,11,16,0.92)', alignItems: 'center', justifyContent: 'center', padding: spacing.xxl },
+  connectionOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(9,11,16,0.92)', alignItems: 'center', justifyContent: 'center', padding: spacing.xxl },
   connectionText: { ...typography.bodyMedium, color: colors.white, marginTop: spacing.md },
   connectionErrorTitle: { ...typography.h3, color: colors.white, textAlign: 'center' },
   connectionErrorText: { ...typography.body, color: '#D0D5DD', textAlign: 'center', marginTop: spacing.sm },
