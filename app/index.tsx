@@ -1,17 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { Redirect } from 'expo-router'
-import { colors, typography } from '../constants/theme'
+import { colors } from '../constants/theme'
 
 const LOGO_URL =
   'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png'
 
 export default function Index() {
-  useEffect(() => {
-    // Mantém a tela de abertura visível por um breve período antes de seguir para o login.
-  }, [])
-
-  const [showApp, setShowApp] = require('react').useState(false)
+  const [showApp, setShowApp] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setShowApp(true), 1800)
