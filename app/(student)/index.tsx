@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dangerSoft,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: colors.borderStrong,
     padding: spacing.lg,
     marginBottom: spacing.xxl,
   },
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     ...typography.caption,
-    color: '#B42318',
+    color: colors.danger,
     marginTop: spacing.xs,
   },
   sectionHeader: {
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   buttonDisabled: {
-    backgroundColor: '#E4E7EC',
+    backgroundColor: colors.surfaceMuted,
   },
   buttonPressed: {
     opacity: 0.82,
