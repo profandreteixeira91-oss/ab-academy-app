@@ -1,19 +1,674 @@
-import { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { getStudentId } from '@/lib/student'
 import { supabase } from '@/lib/supabase'
+import { AppCard } from '@/components/AppCard'
+import { colors, radius, spacing, typography } from '@/constants/theme'
 
-type Exercise={id:string;titulo:string|null;enunciado:string;tipo:string;ordem:number}
-type Alternative={id:string;exercicio_id:string;texto:string;ordem:number}
-
-export default function ActivityDetailScreen(){
- const{id}=useLocalSearchParams<{id:string}>();const[title,setTitle]=useState('');const[description,setDescription]=useState('');const[exercises,setExercises]=useState<Exercise[]>([]);const[alts,setAlts]=useState<Record<string,Alternative[]>>({});const[answers,setAnswers]=useState<Record<string,{text:string;ids:string[]}>>({});const[loading,setLoading]=useState(true);const[saving,setSaving]=useState(false)
- const load=useCallback(async()=>{try{const studentId=await getStudentId();const{data:a,error:ae}=await supabase.from('atividades').select('id,titulo,descricao,status').eq('id',id).eq('aluno_id',studentId).single();if(ae)throw ae;setTitle(a.titulo);setDescription(a.descricao||'');const{data:e,error:ee}=await supabase.from('atividade_exercicios').select('id,titulo,enunciado,tipo,ordem').eq('atividade_id',id).order('ordem');if(ee)throw ee;setExercises(e??[]);const ids=(e??[]).map(x=>x.id);if(ids.length){const{data:v,error:ve}=await supabase.from('exercicio_alternativas').select('id,exercicio_id,texto,ordem').in('exercicio_id',ids).order('ordem');if(ve)throw ve;const grouped:Record<string,Alternative[]>={};for(const x of v??[])(grouped[x.exercicio_id]??=[]).push(x);setAlts(grouped)}}catch(e){Alert.alert('Atividade',e instanceof Error?e.message:'Não foi possível carregar a atividade.');router.back()}finally{setLoading(false)}},[id])
- useEffect(()=>{void load()},[load])
- function toggle(exerciseId:string,alternativeId:string,single:boolean){setAnswers(p=>{const c=p[exerciseId]??{text:'',ids:[]};const ids=single?(c.ids.includes(alternativeId)?[]:[alternativeId]):(c.ids.includes(alternativeId)?c.ids.filter(x=>x!==alternativeId):[...c.ids,alternativeId]);return{...p,[exerciseId]:{...c,ids}}})}
- async function submit(){if(!id)return;setSaving(true);try{const studentId=await getStudentId();const{data:current,error:ce}=await supabase.from('respostas_aluno').select('id').eq('atividade_id',id).eq('aluno_id',studentId);if(ce)throw ce;const oldIds=(current??[]).map(x=>x.id);if(oldIds.length){const{error}=await supabase.from('respostas_aluno').delete().in('id',oldIds);if(error)throw error}const rows=exercises.map(e=>{const a=answers[e.id]??{text:'',ids:[]};const objective=['multipla_escolha','multipla_resposta','verdadeiro_falso'].includes(e.tipo);return{atividade_id:id,exercicio_id:e.id,aluno_id:studentId,resposta_texto:objective?(a.ids.length>1?JSON.stringify(a.ids):null):(a.text.trim()||null),alternativa_id:objective&&(e.tipo==='multipla_escolha'||e.tipo==='verdadeiro_falso')?(a.ids[0]||null):null,pontuacao:null,feedback:null,corrigida:false}});if(rows.length){const{error}=await supabase.from('respostas_aluno').insert(rows);if(error)throw error}const{data:updated,error:ue}=await supabase.from('atividades').update({status:'respondida',updated_at:new Date().toISOString()}).eq('id',id).eq('aluno_id',studentId).select('id,status').maybeSingle();if(ue)throw ue;if(!updated||updated.status!=='respondida')throw new Error('Não foi possível confirmar o envio da atividade.');Alert.alert('Atividade','Atividade enviada com sucesso.');router.back()}catch(e){Alert.alert('Atividade',e instanceof Error?e.message:'Não foi possível enviar a atividade.')}finally{setSaving(false)}}
- if(loading)return<View style={styles.loading}><ActivityIndicator size="large"/></View>
- return<ScrollView style={styles.container} contentContainerStyle={styles.content}><Pressable onPress={()=>router.back()}><Text style={styles.back}>‹ Voltar</Text></Pressable><Text style={styles.title}>{title}</Text>{description?<Text style={styles.description}>{description}</Text>:null}{exercises.map((e,i)=>{const options=alts[e.id]??[];const single=e.tipo==='multipla_escolha'||e.tipo==='verdadeiro_falso';return<View key={e.id} style={styles.exercise}><Text style={styles.number}>QUESTÃO {i+1}</Text>{e.titulo?<Text style={styles.exerciseTitle}>{e.titulo}</Text>:null}<Text style={styles.question}>{e.enunciado}</Text>{options.map(o=>{const selected=answers[e.id]?.ids.includes(o.id);return<Pressable key={o.id} style={[styles.option,selected&&styles.selected]} onPress={()=>toggle(e.id,o.id,single)}><Text style={styles.optionText}>{o.texto}</Text></Pressable>})}{!options.length?<TextInput style={styles.input} multiline placeholder="Digite sua resposta..." value={answers[e.id]?.text??''} onChangeText={text=>setAnswers(p=>({...p,[e.id]:{text,ids:p[e.id]?.ids??[]}}))}/>:null}</View>})}<Pressable style={styles.submit} disabled={saving} onPress={()=>void submit()}><Text style={styles.submitText}>{saving?'Enviando...':'Enviar atividade'}</Text></Pressable></ScrollView>
+type Exercise = {
+  id: string
+  titulo: string | null
+  enunciado: string
+  tipo: string
+  ordem: number
 }
-const styles=StyleSheet.create({loading:{flex:1,alignItems:'center',justifyContent:'center',backgroundColor:'#f6f7fb'},container:{flex:1,backgroundColor:'#f6f7fb'},content:{padding:24,paddingTop:52,paddingBottom:50},back:{color:'#2563eb',fontWeight:'700',marginBottom:18},title:{fontSize:28,fontWeight:'800',color:'#111827'},description:{marginTop:8,color:'#667085',lineHeight:21,marginBottom:20},exercise:{backgroundColor:'#fff',borderRadius:18,padding:18,marginBottom:12},number:{fontSize:11,fontWeight:'800',color:'#667085',letterSpacing:1},exerciseTitle:{fontSize:16,fontWeight:'800',color:'#111827',marginTop:8},question:{fontSize:17,fontWeight:'700',color:'#111827',lineHeight:23,marginTop:8,marginBottom:14},option:{borderWidth:1,borderColor:'#d9dde5',borderRadius:12,padding:14,marginTop:8},selected:{borderColor:'#111827',backgroundColor:'#f2f4f7'},optionText:{color:'#344054',lineHeight:20},input:{minHeight:110,borderWidth:1,borderColor:'#d9dde5',borderRadius:12,padding:14,textAlignVertical:'top'},submit:{height:52,borderRadius:14,backgroundColor:'#111827',alignItems:'center',justifyContent:'center',marginTop:8},submitText:{color:'#fff',fontWeight:'800'}})
+
+type Alternative = {
+  id: string
+  exercicio_id: string
+  texto: string
+  ordem: number
+}
+
+export default function ActivityDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [exercises, setExercises] = useState<Exercise[]>([])
+  const [alts, setAlts] = useState<Record<string, Alternative[]>>({})
+  const [answers, setAnswers] = useState<Record<string, { text: string; ids: string[] }>>({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  const load = useCallback(async () => {
+    try {
+      const studentId = await getStudentId()
+
+      const { data: activity, error: activityError } = await supabase
+        .from('atividades')
+        .select('id,titulo,descricao,status')
+        .eq('id', id)
+        .eq('aluno_id', studentId)
+        .single()
+
+      if (activityError) throw activityError
+
+      setTitle(activity.titulo)
+      setDescription(activity.descricao || '')
+
+      const { data: exerciseData, error: exerciseError } = await supabase
+        .from('atividade_exercicios')
+        .select('id,titulo,enunciado,tipo,ordem')
+        .eq('atividade_id', id)
+        .order('ordem')
+
+      if (exerciseError) throw exerciseError
+
+      const loadedExercises = exerciseData ?? []
+      setExercises(loadedExercises)
+
+      const ids = loadedExercises.map((exercise) => exercise.id)
+
+      if (ids.length) {
+        const { data: alternatives, error: alternativesError } = await supabase
+          .from('exercicio_alternativas')
+          .select('id,exercicio_id,texto,ordem')
+          .in('exercicio_id', ids)
+          .order('ordem')
+
+        if (alternativesError) throw alternativesError
+
+        const grouped: Record<string, Alternative[]> = {}
+
+        for (const alternative of alternatives ?? []) {
+          ;(grouped[alternative.exercicio_id] ??= []).push(alternative)
+        }
+
+        setAlts(grouped)
+      }
+    } catch (e) {
+      Alert.alert(
+        'Atividade',
+        e instanceof Error ? e.message : 'Não foi possível carregar a atividade.'
+      )
+      router.back()
+    } finally {
+      setLoading(false)
+    }
+  }, [id])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  function toggle(exerciseId: string, alternativeId: string, single: boolean) {
+    setAnswers((previous) => {
+      const current = previous[exerciseId] ?? { text: '', ids: [] }
+
+      const ids = single
+        ? current.ids.includes(alternativeId)
+          ? []
+          : [alternativeId]
+        : current.ids.includes(alternativeId)
+          ? current.ids.filter((value) => value !== alternativeId)
+          : [...current.ids, alternativeId]
+
+      return {
+        ...previous,
+        [exerciseId]: {
+          ...current,
+          ids,
+        },
+      }
+    })
+  }
+
+  async function submit() {
+    if (!id) return
+
+    setSaving(true)
+
+    try {
+      const studentId = await getStudentId()
+
+      const { data: current, error: currentError } = await supabase
+        .from('respostas_aluno')
+        .select('id')
+        .eq('atividade_id', id)
+        .eq('aluno_id', studentId)
+
+      if (currentError) throw currentError
+
+      const oldIds = (current ?? []).map((answer) => answer.id)
+
+      if (oldIds.length) {
+        const { error } = await supabase
+          .from('respostas_aluno')
+          .delete()
+          .in('id', oldIds)
+
+        if (error) throw error
+      }
+
+      const rows = exercises.map((exercise) => {
+        const answer = answers[exercise.id] ?? { text: '', ids: [] }
+        const objective = [
+          'multipla_escolha',
+          'multipla_resposta',
+          'verdadeiro_falso',
+        ].includes(exercise.tipo)
+
+        return {
+          atividade_id: id,
+          exercicio_id: exercise.id,
+          aluno_id: studentId,
+          resposta_texto:
+            objective
+              ? answer.ids.length > 1
+                ? JSON.stringify(answer.ids)
+                : null
+              : answer.text.trim() || null,
+          alternativa_id:
+            objective &&
+            (exercise.tipo === 'multipla_escolha' ||
+              exercise.tipo === 'verdadeiro_falso')
+              ? answer.ids[0] || null
+              : null,
+          pontuacao: null,
+          feedback: null,
+          corrigida: false,
+        }
+      })
+
+      if (rows.length) {
+        const { error } = await supabase.from('respostas_aluno').insert(rows)
+        if (error) throw error
+      }
+
+      const { data: updated, error: updateError } = await supabase
+        .from('atividades')
+        .update({
+          status: 'respondida',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('aluno_id', studentId)
+        .select('id,status')
+        .maybeSingle()
+
+      if (updateError) throw updateError
+
+      if (!updated || updated.status !== 'respondida') {
+        throw new Error('Não foi possível confirmar o envio da atividade.')
+      }
+
+      Alert.alert('Atividade', 'Atividade enviada com sucesso.')
+      router.back()
+    } catch (e) {
+      Alert.alert(
+        'Atividade',
+        e instanceof Error ? e.message : 'Não foi possível enviar a atividade.'
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const answeredCount = useMemo(
+    () =>
+      exercises.filter((exercise) => {
+        const answer = answers[exercise.id]
+        return Boolean(answer?.text.trim() || answer?.ids.length)
+      }).length,
+    [answers, exercises]
+  )
+
+  const progress = exercises.length ? answeredCount / exercises.length : 0
+
+  if (loading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    )
+  }
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Text style={styles.backArrow}>‹</Text>
+        <Text style={styles.backText}>Voltar</Text>
+      </Pressable>
+
+      <View style={styles.header}>
+        <View style={styles.headerBadge}>
+          <Text style={styles.headerBadgeText}>ATIVIDADE</Text>
+        </View>
+        <Text style={styles.title}>{title}</Text>
+        {description ? <Text style={styles.description}>{description}</Text> : null}
+      </View>
+
+      <AppCard elevated style={styles.progressCard}>
+        <View style={styles.progressHeader}>
+          <View>
+            <Text style={styles.progressLabel}>SEU PROGRESSO</Text>
+            <Text style={styles.progressTitle}>
+              {answeredCount} de {exercises.length} respondidas
+            </Text>
+          </View>
+          <Text style={styles.progressPercent}>{Math.round(progress * 100)}%</Text>
+        </View>
+
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        </View>
+      </AppCard>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Questões</Text>
+        <Text style={styles.sectionSubtitle}>
+          Responda com atenção antes de enviar.
+        </Text>
+      </View>
+
+      {exercises.map((exercise, index) => {
+        const options = alts[exercise.id] ?? []
+        const single =
+          exercise.tipo === 'multipla_escolha' ||
+          exercise.tipo === 'verdadeiro_falso'
+        const currentAnswer = answers[exercise.id] ?? { text: '', ids: [] }
+        const answered = Boolean(
+          currentAnswer.text.trim() || currentAnswer.ids.length
+        )
+
+        return (
+          <AppCard key={exercise.id} elevated={answered} style={styles.exercise}>
+            <View style={styles.exerciseTop}>
+              <View style={styles.questionNumber}>
+                <Text style={styles.questionNumberText}>{index + 1}</Text>
+              </View>
+              <View style={styles.questionMeta}>
+                <Text style={styles.questionLabel}>QUESTÃO {index + 1}</Text>
+                <Text style={styles.questionType}>
+                  {options.length
+                    ? single
+                      ? 'Escolha uma opção'
+                      : 'Selecione as opções'
+                    : 'Resposta escrita'}
+                </Text>
+              </View>
+              {answered ? (
+                <View style={styles.answeredBadge}>
+                  <Text style={styles.answeredText}>OK</Text>
+                </View>
+              ) : null}
+            </View>
+
+            {exercise.titulo ? (
+              <Text style={styles.exerciseTitle}>{exercise.titulo}</Text>
+            ) : null}
+
+            <Text style={styles.question}>{exercise.enunciado}</Text>
+
+            {options.length ? (
+              <View style={styles.options}>
+                {options.map((option, optionIndex) => {
+                  const selected = currentAnswer.ids.includes(option.id)
+
+                  return (
+                    <Pressable
+                      key={option.id}
+                      style={({ pressed }) => [
+                        styles.option,
+                        selected && styles.optionSelected,
+                        pressed && styles.optionPressed,
+                      ]}
+                      onPress={() => toggle(exercise.id, option.id, single)}
+                    >
+                      <View
+                        style={[
+                          styles.optionIndicator,
+                          selected && styles.optionIndicatorSelected,
+                        ]}
+                      >
+                        {selected ? (
+                          <Text style={styles.optionCheck}>✓</Text>
+                        ) : (
+                          <Text style={styles.optionLetter}>
+                            {String.fromCharCode(65 + optionIndex)}
+                          </Text>
+                        )}
+                      </View>
+                      <Text
+                        style={[
+                          styles.optionText,
+                          selected && styles.optionTextSelected,
+                        ]}
+                      >
+                        {option.texto}
+                      </Text>
+                    </Pressable>
+                  )
+                })}
+              </View>
+            ) : (
+              <TextInput
+                style={styles.input}
+                multiline
+                placeholder="Digite sua resposta..."
+                placeholderTextColor={colors.textTertiary}
+                value={currentAnswer.text}
+                onChangeText={(text) =>
+                  setAnswers((previous) => ({
+                    ...previous,
+                    [exercise.id]: {
+                      text,
+                      ids: previous[exercise.id]?.ids ?? [],
+                    },
+                  }))
+                }
+              />
+            )}
+          </AppCard>
+        )
+      })}
+
+      <View style={styles.submitArea}>
+        <Text style={styles.submitHint}>
+          Revise suas respostas antes de enviar a atividade.
+        </Text>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.submit,
+            saving && styles.submitDisabled,
+            pressed && !saving && styles.submitPressed,
+          ]}
+          disabled={saving}
+          onPress={() => void submit()}
+        >
+          {saving ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <>
+              <Text style={styles.submitText}>Enviar atividade</Text>
+              <Text style={styles.submitArrow}>→</Text>
+            </>
+          )}
+        </Pressable>
+      </View>
+    </ScrollView>
+  )
+}
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.background,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    padding: spacing.xxl,
+    paddingTop: 28,
+    paddingBottom: 48,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginBottom: spacing.xl,
+  },
+  backArrow: {
+    fontSize: 27,
+    lineHeight: 22,
+    color: colors.text,
+    marginRight: 5,
+  },
+  backText: {
+    ...typography.bodyMedium,
+    color: colors.text,
+  },
+  header: {
+    marginBottom: spacing.xxl,
+  },
+  headerBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: spacing.md,
+  },
+  headerBadgeText: {
+    ...typography.overline,
+    color: colors.textSecondary,
+    fontSize: 9,
+    letterSpacing: 0.9,
+  },
+  title: {
+    ...typography.h1,
+    color: colors.text,
+  },
+  description: {
+    ...typography.body,
+    color: colors.textSecondary,
+    marginTop: spacing.sm,
+  },
+  progressCard: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    marginBottom: spacing.xxl,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  progressLabel: {
+    ...typography.overline,
+    color: '#AAB2C0',
+  },
+  progressTitle: {
+    ...typography.bodyMedium,
+    color: colors.white,
+    marginTop: 3,
+  },
+  progressPercent: {
+    fontSize: 22,
+    lineHeight: 27,
+    fontWeight: '800',
+    color: colors.white,
+  },
+  progressTrack: {
+    height: 7,
+    borderRadius: radius.pill,
+    backgroundColor: '#343B48',
+    overflow: 'hidden',
+    marginTop: spacing.xl,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: radius.pill,
+    backgroundColor: colors.white,
+  },
+  sectionHeader: {
+    marginBottom: spacing.md,
+  },
+  sectionTitle: {
+    ...typography.h3,
+    color: colors.text,
+  },
+  sectionSubtitle: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  exercise: {
+    marginBottom: spacing.md,
+    padding: spacing.xl,
+  },
+  exerciseTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  questionNumber: {
+    width: 38,
+    height: 38,
+    borderRadius: 13,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  questionNumberText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: colors.white,
+  },
+  questionMeta: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  questionLabel: {
+    ...typography.overline,
+    color: colors.text,
+    fontSize: 9,
+  },
+  questionType: {
+    ...typography.caption,
+    color: colors.textTertiary,
+    marginTop: 1,
+  },
+  answeredBadge: {
+    backgroundColor: colors.successSoft,
+    borderRadius: radius.pill,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  answeredText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: colors.success,
+  },
+  exerciseTitle: {
+    ...typography.h3,
+    color: colors.text,
+    marginTop: spacing.xl,
+  },
+  question: {
+    fontSize: 17,
+    lineHeight: 24,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  options: {
+    gap: spacing.sm,
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    minHeight: 56,
+  },
+  optionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+  },
+  optionPressed: {
+    opacity: 0.82,
+  },
+  optionIndicator: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+    backgroundColor: colors.surface,
+  },
+  optionIndicatorSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
+  },
+  optionLetter: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: colors.textSecondary,
+  },
+  optionCheck: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: colors.white,
+  },
+  optionText: {
+    flex: 1,
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  optionTextSelected: {
+    color: colors.text,
+    fontWeight: '600',
+  },
+  input: {
+    minHeight: 130,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: radius.md,
+    padding: spacing.lg,
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
+    textAlignVertical: 'top',
+    backgroundColor: colors.surfaceMuted,
+  },
+  submitArea: {
+    marginTop: spacing.md,
+  },
+  submitHint: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  submit: {
+    minHeight: 56,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+  },
+  submitDisabled: {
+    opacity: 0.7,
+  },
+  submitPressed: {
+    opacity: 0.86,
+    transform: [{ scale: 0.99 }],
+  },
+  submitText: {
+    ...typography.bodyMedium,
+    color: colors.white,
+  },
+  submitArrow: {
+    fontSize: 21,
+    color: colors.white,
+    marginLeft: spacing.sm,
+  },
+})
