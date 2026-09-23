@@ -64,7 +64,45 @@ export default function MoreScreen() {
             <Text style={styles.profileBadgeText}>ATIVO</Text>
           </View>
         </View>
+
+        <Pressable
+          style={({ pressed }) => [styles.profileAction, pressed && styles.pressed]}
+          onPress={() =>
+            Alert.alert(
+              'Meu perfil',
+              'A edição do perfil será integrada na próxima etapa.'
+            )
+          }
+        >
+          <View style={styles.actionIcon}>
+            <Text style={styles.actionIconText}>↗</Text>
+          </View>
+
+          <View style={styles.actionCopy}>
+            <Text style={styles.actionTitle}>Meu perfil</Text>
+            <Text style={styles.actionSubtitle}>Consultar dados cadastrais</Text>
+          </View>
+
+          <Text style={styles.chevron}>›</Text>
+        </Pressable>
       </AppCard>
+
+      <Text style={styles.sectionTitle}>Conta e suporte</Text>
+
+      <View style={styles.menuCard}>
+        <Pressable
+          style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}
+          onPress={() =>
+            Alert.alert(
+              'Minhas solicitações',
+              'O atendimento será integrado na próxima etapa.'
+            )
+          }
+        >
+          <View style={styles.menuIcon}>
+            <Text style={styles.menuIconText}>?</Text>
+          </View>
+
           <View style={styles.menuCopy}>
             <Text style={styles.menuTitle}>Minhas solicitações</Text>
             <Text style={styles.menuSubtitle}>Pedidos e atendimentos</Text>
@@ -179,6 +217,40 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.5,
   },
+  profileAction: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  actionIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  actionIconText: {
+    color: colors.primary,
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  actionCopy: {
+    flex: 1,
+  },
+  actionTitle: {
+    ...typography.bodyMedium,
+    color: colors.text,
+  },
+  actionSubtitle: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 1,
+  },
   chevron: {
     fontSize: 28,
     lineHeight: 30,
@@ -190,6 +262,46 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.sm,
     marginLeft: 2,
+  },
+  menuCard: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.lg,
+    marginBottom: 26,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    minHeight: 76,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menuIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  menuIconText: {
+    color: colors.white,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  menuCopy: {
+    flex: 1,
+  },
+  menuTitle: {
+    ...typography.bodyMedium,
+    color: colors.text,
+  },
+  menuSubtitle: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 2,
   },
   logout: {
     minHeight: 68,
