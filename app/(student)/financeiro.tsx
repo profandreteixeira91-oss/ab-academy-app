@@ -1,16 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native'
-
-export default function FinanceiroScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Financeiro</Text>
-      <Text style={styles.subtitle}>Suas mensalidades e pagamentos aparecerão aqui.</Text>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f6f7fb', padding: 24, paddingTop: 64 },
-  title: { fontSize: 28, fontWeight: '800', color: '#111827' },
-  subtitle: { marginTop: 8, color: '#667085' },
-})
+import { useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { getStudentId, formatBRDate } from '@/lib/student'
+import { supabase } from '@/lib/supabase'
+type Entry={id:string;competencia:string;data_vencimento:string;data_pagamento:string|null;valor:number;status:string;metodo_pagamento:string|null;numero_parcela:number|null;total_parcelas:number|null}
+export default function FinanceiroScreen(){const[entries,setEntries]=useState<Entry[]>([]);const[loading,setLoading]=useState(true);const[refreshing,setRefreshing]=useState(false);const[error,setError]=useState('');const load=useCallback(async()=>{try{setError('');const id=await getStudentId();const{data,error:e}=await supabase.from('mensalidades').select('id,competencia,data_vencimento,data_pagamento,valor,status,metodo_pagamento,numero_parcela,total_parcelas').eq('aluno_id',id).order('data_vencimento',{ascending:false});if(e)throw e;setEntries((data??[]).map(x=>({...x,valor:Number(x.valor)||0})))}catch(e){setError(e instanceof Error?e.message:'Não foi possível carregar seu financeiro.')}finally{setLoading(false);setRefreshing(false)}},[]);useEffect(()=>{void load()},[load]);if(loading)return<View style={styles.loading}><ActivityIndicator size="large"/></View>;return<ScrollView style={styles.container} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>{setRefreshing(true);void load()}}/>}><Text style={styles.eyebrow}>FINANCEIRO</Text><Text style={styles.title}>Meu financeiro</Text><Text style={styles.subtitle}>Mensalidades e pagamentos.</Text>{error?<View style={styles.error}><Text style={styles.errorText}>{error}</Text></View>:null}{entries.length===0?<View style={styles.empty}><Text style={styles.emptyTitle}>Nenhuma mensalidade encontrada</Text><Text style={styles.emptyText}>Seu histórico financeiro aparecerá aqui.</Text></View>:entries.map(x=><View key={x.id} style={styles.card}><View style={styles.row}><Text style={styles.comp}>{x.competencia}</Text><Text style={styles.status}>{x.status}</Text></View><Text style={styles.value}>R$ {x.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</Text><Text style={styles.meta}>Vencimento: {formatBRDate(x.data_vencimento)}</Text>{x.data_pagamento?<Text style={styles.meta}>Pagamento: {formatBRDate(x.data_pagamento)}</Text>:null}{x.numero_parcela&&x.total_parcelas?<Text style={styles.meta}>Parcela: {x.numero_parcela}/{x.total_parcelas}</Text>:null}{x.metodo_pagamento?<Text style={styles.meta}>Método: {x.metodo_pagamento}</Text>:null}</View>)}</ScrollView>}
+const styles=StyleSheet.create({loading:{flex:1,alignItems:'center',justifyContent:'center',backgroundColor:'#f6f7fb'},container:{flex:1,backgroundColor:'#f6f7fb'},content:{padding:24,paddingTop:52,paddingBottom:36},eyebrow:{fontSize:12,fontWeight:'800',letterSpacing:1.2,color:'#667085'},title:{fontSize:30,fontWeight:'800',color:'#111827',marginTop:8},subtitle:{fontSize:15,color:'#667085',marginTop:6,marginBottom:20},card:{backgroundColor:'#fff',borderRadius:20,padding:20,marginBottom:12},row:{flexDirection:'row',justifyContent:'space-between',alignItems:'center'},comp:{fontSize:17,fontWeight:'800',color:'#111827'},status:{fontSize:12,fontWeight:'800',textTransform:'uppercase',color:'#475467'},value:{fontSize:25,fontWeight:'800',color:'#111827',marginTop:12},meta:{fontSize:13,color:'#667085',marginTop:6},empty:{backgroundColor:'#fff',borderRadius:20,padding:24},emptyTitle:{fontSize:18,fontWeight:'800',color:'#111827'},emptyText:{marginTop:8,color:'#667085',lineHeight:21},error:{backgroundColor:'#fff1f2',borderRadius:14,padding:14,marginBottom:12},errorText:{color:'#be123c',lineHeight:19}})
