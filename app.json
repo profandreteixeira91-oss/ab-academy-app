@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "AB Academy",
+    "slug": "ab-academy-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "abacademy",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.abacademy.app"
+    },
+    "android": {
+      "package": "com.abacademy.app"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
