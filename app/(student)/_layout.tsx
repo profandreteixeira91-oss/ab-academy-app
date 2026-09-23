@@ -4,19 +4,37 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { supabase } from '@/lib/supabase'
 import { colors, radius } from '@/constants/theme'
 
-const icons = {
-  inicio: '⌂',
-  aulas: '▣',
-  atividades: '✓',
-  financeiro: '▤',
-  mais: '○',
+const tabs = {
+  inicio: { icon: '⌂', label: 'Início' },
+  aulas: { icon: '▣', label: 'Aulas' },
+  atividades: { icon: '✓', label: 'Atividades' },
+  financeiro: { icon: '▤', label: 'Financeiro' },
+  mais: { icon: '•••', label: 'Mais' },
 } as const
 
-function TabIcon({ icon, color, focused }: { icon: string; color: string; focused: boolean }) {
+function TabIcon({
+  icon,
+  color,
+  focused,
+}: {
+  icon: string
+  color: string
+  focused: boolean
+}) {
   return (
-    <Text style={[styles.icon, { color, fontWeight: focused ? '800' : '500' }]}>
-      {icon}
-    </Text>
+    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+      <Text
+        style={[
+          styles.icon,
+          {
+            color: focused ? colors.primary : color,
+            fontWeight: focused ? '900' : '600',
+          },
+        ]}
+      >
+        {icon}
+      </Text>
+    </View>
   )
 }
 
@@ -43,7 +61,11 @@ export default function StudentLayout() {
   }, [])
 
   if (checking) {
-    return <View style={styles.loading}><ActivityIndicator size="small" color={colors.primary} /></View>
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    )
   }
 
   if (!authenticated) return <Redirect href="/(auth)/login" />
@@ -61,28 +83,99 @@ export default function StudentLayout() {
         tabBarHideOnKeyboard: true,
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Início', tabBarIcon: ({ color, focused }) => <TabIcon icon={icons.inicio} color={color} focused={focused} /> }} />
-      <Tabs.Screen name="aulas" options={{ title: 'Aulas', tabBarIcon: ({ color, focused }) => <TabIcon icon={icons.aulas} color={color} focused={focused} /> }} />
-      <Tabs.Screen name="atividades" options={{ title: 'Atividades', tabBarIcon: ({ color, focused }) => <TabIcon icon={icons.atividades} color={color} focused={focused} /> }} />
-      <Tabs.Screen name="financeiro" options={{ title: 'Financeiro', tabBarIcon: ({ color, focused }) => <TabIcon icon={icons.financeiro} color={color} focused={focused} /> }} />
-      <Tabs.Screen name="mais" options={{ title: 'Mais', tabBarIcon: ({ color, focused }) => <TabIcon icon={icons.mais} color={color} focused={focused} /> }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: tabs.inicio.label,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={tabs.inicio.icon} color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="aulas"
+        options={{
+          title: tabs.aulas.label,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={tabs.aulas.icon} color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="atividades"
+        options={{
+          title: tabs.atividades.label,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={tabs.atividades.icon} color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="financeiro"
+        options={{
+          title: tabs.financeiro.label,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={tabs.financeiro.icon} color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="mais"
+        options={{
+          title: tabs.mais.label,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={tabs.mais.icon} color={color} focused={focused} />
+          ),
+        }}
+      />
     </Tabs>
   )
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.background,
+  },
   tabBar: {
-    height: 82,
-    paddingTop: 9,
-    paddingBottom: 12,
-    paddingHorizontal: 8,
+    height: 88,
+    paddingTop: 8,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    elevation: 8,
+    elevation: 10,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: -5 },
   },
-  label: { fontSize: 10, fontWeight: '700', marginTop: 2 },
-  item: { borderRadius: radius.md },
-  icon: { fontSize: 22, lineHeight: 25 },
+  label: {
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '800',
+    marginTop: 1,
+  },
+  item: {
+    borderRadius: radius.lg,
+    paddingVertical: 2,
+  },
+  iconWrap: {
+    width: 42,
+    height: 30,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 1,
+  },
+  iconWrapActive: {
+    backgroundColor: colors.primarySoft,
+  },
+  icon: {
+    fontSize: 20,
+    lineHeight: 23,
+  },
 })
