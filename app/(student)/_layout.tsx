@@ -1,6 +1,6 @@
 import { Redirect, Tabs } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ColorValue, StyleSheet, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
 import { colors, radius } from '@/constants/theme'
@@ -21,7 +21,7 @@ function TabIcon({
   focused,
 }: {
   tab: TabIconName
-  color: string
+  color: string | ColorValue
   focused: boolean
 }) {
   const iconName = focused ? tabs[tab].activeIcon : tabs[tab].icon
