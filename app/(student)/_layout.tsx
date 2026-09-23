@@ -1,39 +1,38 @@
 import { Redirect, Tabs } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
 import { colors, radius } from '@/constants/theme'
 
 const tabs = {
-  inicio: { icon: '⌂', label: 'Início' },
-  aulas: { icon: '▣', label: 'Aulas' },
-  atividades: { icon: '✓', label: 'Atividades' },
-  financeiro: { icon: '▤', label: 'Financeiro' },
-  mais: { icon: '•••', label: 'Mais' },
+  inicio: { icon: 'home-outline', activeIcon: 'home' },
+  aulas: { icon: 'calendar-outline', activeIcon: 'calendar' },
+  atividades: { icon: 'checkmark-circle-outline', activeIcon: 'checkmark-circle' },
+  financeiro: { icon: 'card-outline', activeIcon: 'card' },
+  mais: { icon: 'menu-outline', activeIcon: 'menu' },
 } as const
 
+type TabIconName = keyof typeof tabs
+
 function TabIcon({
-  icon,
+  tab,
   color,
   focused,
 }: {
-  icon: string
+  tab: TabIconName
   color: string
   focused: boolean
 }) {
+  const iconName = focused ? tabs[tab].activeIcon : tabs[tab].icon
+
   return (
     <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-      <Text
-        style={[
-          styles.icon,
-          {
-            color: focused ? colors.primary : color,
-            fontWeight: focused ? '900' : '600',
-          },
-        ]}
-      >
-        {icon}
-      </Text>
+      <Ionicons
+        name={iconName}
+        size={21}
+        color={focused ? colors.primary : color}
+      />
     </View>
   )
 }
@@ -86,45 +85,45 @@ export default function StudentLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: tabs.inicio.label,
+          title: 'Início',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon={tabs.inicio.icon} color={color} focused={focused} />
+            <TabIcon tab="inicio" color={color} focused={focused} />
           ),
         }}
       />
       <Tabs.Screen
         name="aulas"
         options={{
-          title: tabs.aulas.label,
+          title: 'Aulas',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon={tabs.aulas.icon} color={color} focused={focused} />
+            <TabIcon tab="aulas" color={color} focused={focused} />
           ),
         }}
       />
       <Tabs.Screen
         name="atividades"
         options={{
-          title: tabs.atividades.label,
+          title: 'Atividades',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon={tabs.atividades.icon} color={color} focused={focused} />
+            <TabIcon tab="atividades" color={color} focused={focused} />
           ),
         }}
       />
       <Tabs.Screen
         name="financeiro"
         options={{
-          title: tabs.financeiro.label,
+          title: 'Financeiro',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon={tabs.financeiro.icon} color={color} focused={focused} />
+            <TabIcon tab="financeiro" color={color} focused={focused} />
           ),
         }}
       />
       <Tabs.Screen
         name="mais"
         options={{
-          title: tabs.mais.label,
+          title: 'Mais',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon={tabs.mais.icon} color={color} focused={focused} />
+            <TabIcon tab="mais" color={color} focused={focused} />
           ),
         }}
       />
@@ -173,9 +172,5 @@ const styles = StyleSheet.create({
   },
   iconWrapActive: {
     backgroundColor: colors.primarySoft,
-  },
-  icon: {
-    fontSize: 20,
-    lineHeight: 23,
   },
 })
