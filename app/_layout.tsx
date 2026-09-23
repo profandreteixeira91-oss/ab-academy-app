@@ -1,9 +1,9 @@
 import Constants from 'expo-constants'
-import { registerGlobals } from '@livekit/react-native'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
 if (Constants.appOwnership !== 'expo') {
+  const { registerGlobals } = require('@livekit/react-native')
   registerGlobals()
 }
 
