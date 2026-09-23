@@ -87,6 +87,26 @@ export default function MoreScreen() {
         </Pressable>
       </AppCard>
 
+      <Text style={styles.sectionTitle}>Aprendizado</Text>
+
+      <View style={styles.menuCard}>
+        <Pressable
+          style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}
+          onPress={() => router.push('/(student)/central')}
+        >
+          <View style={styles.menuIcon}>
+            <Text style={styles.menuIconText}>✦</Text>
+          </View>
+
+          <View style={styles.menuCopy}>
+            <Text style={styles.menuTitle}>Central de Atividades</Text>
+            <Text style={styles.menuSubtitle}>Prática contínua por idioma e nível</Text>
+          </View>
+
+          <Text style={styles.chevron}>›</Text>
+        </Pressable>
+      </View>
+
       <Text style={styles.sectionTitle}>Conta e suporte</Text>
 
       <View style={styles.menuCard}>
