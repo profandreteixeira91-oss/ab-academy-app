@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Constants from 'expo-constants'
+import { Platform } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { canEnterLesson, getNextLessonOccurrence, getStudentId } from '@/lib/student'
 import { supabase } from '@/lib/supabase'
@@ -46,11 +47,23 @@ export default function LessonRoomScreen() {
   useEffect(() => {
     if (!livekit || Constants.appOwnership === 'expo') return
     let active = true
-    void import('@/components/LiveKitClassroom').then((module) => {
-      if (active) setLiveKitClassroom(() => module.LiveKitClassroom)
-    }).catch((err) => {
-      if (active) setError(err instanceof Error ? err.message : 'O módulo da sala virtual não está disponível neste dispositivo.')
-    })
+    void import('@/components/LiveKitClassroom')
+      .then(async (module) => {
+        if (Platform.OS !== 'web' && Constants.appOwnership !== 'expo') {
+          const livekit = await import('@livekit/react-native')
+          livekit.registerGlobals()
+        }
+        if (active) setLiveKitClassroom(() => module.LiveKitClassroom)
+      })
+      .catch((err) => {
+        if (active) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : 'O módulo da sala virtual não está disponível neste dispositivo.'
+          )
+        }
+      })
     return () => { active = false }
   }, [livekit])
 
