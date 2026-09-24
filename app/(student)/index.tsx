@@ -169,8 +169,7 @@ export default function StudentHome() {
 
             <Pressable
               style={({ pressed }) => [
-                styles.button,
-                !lessonReady && styles.buttonDisabled,
+                lessonReady ? styles.buttonReady : styles.buttonUnavailable,
                 pressed && lessonReady && styles.buttonPressed,
               ]}
               disabled={!lessonReady}
@@ -399,14 +398,16 @@ const styles = StyleSheet.create({
     minHeight: 52,
     marginTop: 20,
     borderRadius: radius.md,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     paddingHorizontal: spacing.lg,
   },
-  buttonDisabled: {
-    backgroundColor: colors.surfaceMuted,
+  buttonReady: {
+    backgroundColor: colors.success,
+  },
+  buttonUnavailable: {
+    backgroundColor: colors.danger,
   },
   buttonPressed: {
     opacity: 0.82,
