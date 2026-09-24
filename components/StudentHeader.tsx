@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   logoArea: {
     position: 'absolute',
-    left: 24,
+    left: -10,
     top: 0,
     bottom: 0,
     justifyContent: 'center',
