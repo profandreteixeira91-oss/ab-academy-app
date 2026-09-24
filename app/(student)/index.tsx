@@ -126,23 +126,27 @@ export default function StudentHome() {
       }
     >
       <View style={styles.header}>
-        <View style={styles.headerBrand}>
-          <Image
-            source={{
-              uri: 'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png',
-            }}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.portalTitle}>PORTAL DO ALUNO</Text>
+        <View style={styles.headerTop}>
+          <View style={styles.headerBrand}>
+            <Image
+              source={{
+                uri: 'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png',
+              }}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.portalTitle}>PORTAL DO ALUNO</Text>
+          </View>
+
+          <Pressable style={styles.profileButton} onPress={() => router.push('/(student)/mais')}>
+            <Text style={styles.profileInitial}>{name.charAt(0).toUpperCase()}</Text>
+          </Pressable>
         </View>
+
         <View style={styles.headerCopy}>
           <Text style={styles.title}>Olá, {name.split(' ')[0]}!</Text>
           <Text style={styles.subtitle}>Seu aprendizado continua aqui.</Text>
         </View>
-        <Pressable style={styles.profileButton} onPress={() => router.push('/(student)/mais')}>
-          <Text style={styles.profileInitial}>{name.charAt(0).toUpperCase()}</Text>
-        </Pressable>
       </View>
 
       {error ? (
@@ -278,34 +282,33 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   header: {
-    minHeight: 128,
+    marginBottom: 30,
+  },
+  headerTop: {
+    minHeight: 78,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 28,
-    position: 'relative',
   },
   headerBrand: {
     flex: 1,
-    paddingRight: spacing.lg,
+    alignItems: 'flex-start',
   },
   logo: {
-    width: 150,
-    height: 46,
+    width: 205,
+    height: 62,
   },
   portalTitle: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
     fontWeight: '800',
-    letterSpacing: 1.6,
-    color: colors.text,
-    marginTop: 2,
+    letterSpacing: 1.8,
+    color: colors.textSecondary,
+    marginTop: -2,
+    marginLeft: 2,
   },
   headerCopy: {
-    position: 'absolute',
-    left: 0,
-    top: 70,
-    width: '100%',
+    marginTop: 20,
   },
   title: {
     ...typography.display,
