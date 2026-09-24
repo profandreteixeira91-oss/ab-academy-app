@@ -5,3 +5,7 @@ web-build/
 .env
 .env.local
 *.log
+
+# Projetos nativos gerados pelo Expo Prebuild/CNG
+android/
+ios/
