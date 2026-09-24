@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, ColorValue, StyleSheet, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
-import { colors, radius } from '@/constants/theme'
+import { colors, radius, typography } from '@/constants/theme'
 
 const tabs = {
   inicio: { icon: 'home-outline', activeIcon: 'home' },
@@ -169,9 +169,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -5 },
   },
   label: {
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '800',
+    ...typography.tab,
+    color: colors.textTertiary,
     marginTop: 1,
   },
   item: {
