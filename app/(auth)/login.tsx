@@ -14,7 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { supabase } from '@/lib/supabase'
-import { colors } from '@/constants/theme'
+import { colors, fonts, typography } from '@/constants/theme'
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
@@ -160,18 +160,17 @@ const styles = StyleSheet.create({
     height: 76,
   },
   title: {
-    fontSize: 30,
-    fontWeight: '800',
+    ...typography.h1,
     color: colors.text,
   },
   subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
+    ...typography.body,
     color: colors.textSecondary,
     marginTop: 8,
     marginBottom: 24,
   },
   input: {
+    ...typography.body,
     height: 52,
     borderWidth: 1,
     borderColor: colors.borderStrong,
@@ -192,6 +191,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   passwordInput: {
+    ...typography.body,
     flex: 1,
     height: '100%',
     paddingHorizontal: 16,
@@ -215,15 +215,13 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   buttonText: {
+    ...typography.button,
     color: colors.white,
-    fontSize: 16,
-    fontWeight: '700',
   },
   link: {
+    ...typography.bodyMedium,
     textAlign: 'center',
     color: colors.accent,
-    fontSize: 14,
-    fontWeight: '600',
     marginTop: 18,
   },
 })
