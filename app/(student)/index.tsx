@@ -169,6 +169,7 @@ export default function StudentHome() {
 
             <Pressable
               style={({ pressed }) => [
+                styles.button,
                 lessonReady ? styles.buttonReady : styles.buttonUnavailable,
                 pressed && lessonReady && styles.buttonPressed,
               ]}
@@ -398,6 +399,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
     marginTop: 20,
     borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
