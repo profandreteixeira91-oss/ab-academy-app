@@ -6,13 +6,17 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
 const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
-if (!supabaseUrl || !supabasePublishableKey) {
-  throw new Error(
-    'Configure EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY no arquivo .env.'
-  )
-}
+export const supabaseConfigured = Boolean(
+  supabaseUrl && supabasePublishableKey
+)
 
-export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
+// Nunca deixe a ausência das variáveis de ambiente derrubar o aplicativo
+// durante a inicialização. Em um build EAS, as variáveis devem ser
+// fornecidas pelo ambiente de build (preview/production).
+const safeSupabaseUrl = supabaseUrl || 'https://placeholder.invalid'
+const safeSupabaseKey = supabasePublishableKey || 'placeholder'
+
+export const supabase = createClient(safeSupabaseUrl, safeSupabaseKey, {
   auth: {
     storage: localStorage,
     autoRefreshToken: true,
