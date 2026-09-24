@@ -162,6 +162,24 @@ export default function CentralActivityScreen() {
 
         const completedIds = new Set((completed ?? []).map((row) => row.atividade_id))
         const available = (sequence ?? []).filter((row) => !completedIds.has(row.id))
+
+        // A Central trabalha somente com atividades ainda não realizadas.
+        // Se uma atividade concluída for aberta por um link antigo ou estado anterior,
+        // encaminha imediatamente para a primeira atividade disponível.
+        if (completedIds.has(current.id)) {
+          const firstAvailable = available[0]
+          if (firstAvailable) {
+            router.replace({
+              pathname: '/(student)/central/atividade/[id]',
+              params: { id: firstAvailable.id },
+            })
+            return
+          }
+
+          router.replace('/(student)/central')
+          return
+        }
+
         const index = available.findIndex((row) => row.id === current.id)
         if (index >= 0) setNextActivity(available[index + 1] ?? null)
 
