@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,6 +11,7 @@ import {
   TextInput,
   View,
 } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { supabase } from '@/lib/supabase'
 import { colors } from '@/constants/theme'
@@ -17,6 +19,7 @@ import { colors } from '@/constants/theme'
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -62,7 +65,16 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.card}>
-        <Text style={styles.brand}>AB Academy</Text>
+        <View style={styles.logoContainer}>
+          <Image
+            source={{
+              uri: 'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png',
+            }}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+
         <Text style={styles.title}>Área do aluno</Text>
         <Text style={styles.subtitle}>Entre para acessar suas aulas e atividades.</Text>
 
@@ -77,14 +89,29 @@ export default function LoginScreen() {
           onChangeText={setEmail}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor={colors.textTertiary}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Senha"
+            placeholderTextColor={colors.textTertiary}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <Pressable
+            style={styles.passwordToggle}
+            onPress={() => setShowPassword((current) => !current)}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+          >
+            <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={22}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+        </View>
 
         <Pressable
           style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
@@ -123,11 +150,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  brand: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.primary,
-    marginBottom: 24,
+  logoContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 28,
+  },
+  logo: {
+    width: 230,
+    height: 76,
   },
   title: {
     fontSize: 30,
@@ -151,13 +181,35 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: colors.surface,
   },
+  passwordContainer: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    marginBottom: 4,
+  },
+  passwordInput: {
+    flex: 1,
+    height: '100%',
+    paddingHorizontal: 16,
+    color: colors.text,
+  },
+  passwordToggle: {
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   button: {
     height: 52,
     borderRadius: 14,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 16,
   },
   buttonPressed: {
     opacity: 0.8,
