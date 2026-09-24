@@ -29,7 +29,8 @@
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-url-polyfill": "^2.0.0",
-    "vector-icons": "^0.1.0"
+    "vector-icons": "^0.1.0",
+    "expo-constants": "~57.0.19"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
