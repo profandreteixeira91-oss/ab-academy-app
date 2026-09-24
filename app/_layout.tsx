@@ -21,7 +21,7 @@ if (Platform.OS !== 'web' && Constants.appOwnership !== 'expo') {
 
 SplashScreen.preventAutoHideAsync().catch(() => {})
 
-const LOGO_URL = 'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png'
+const LOGO = require('../assets/icon.png')
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -55,7 +55,7 @@ export default function RootLayout() {
         <View style={styles.launch}>
           <View style={styles.glow} />
           <View style={styles.logoCircle}>
-            <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
+            <Image source={LOGO} style={styles.logo} resizeMode="contain" />
           </View>
           <Text style={styles.portalTitle}>PORTAL DO ALUNO</Text>
           <View style={styles.accentLine} />
