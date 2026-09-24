@@ -71,10 +71,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 0,
+    paddingHorizontal: 24,
+    position: 'relative',
   },
   logoArea: {
-    width: 124,
+    position: 'absolute',
+    left: 24,
+    top: 0,
+    bottom: 0,
     justifyContent: 'center',
   },
   logo: {
@@ -85,7 +89,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 132,
   },
   moduleName: {
     fontFamily: fonts.bold,
@@ -96,7 +100,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   dateArea: {
-    width: 74,
+    position: 'absolute',
+    right: 24,
+    top: 0,
+    bottom: 0,
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
