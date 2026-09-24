@@ -6,20 +6,15 @@ import {
   Inter_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/inter'
-import Constants from 'expo-constants'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
-import { Image, Platform, StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { colors, fonts } from '@/constants/theme'
 
-if (Platform.OS !== 'web' && Constants.appOwnership !== 'expo') {
-  const { registerGlobals } = require('@livekit/react-native')
-  registerGlobals()
-}
-
 SplashScreen.preventAutoHideAsync().catch(() => {})
+SplashScreen.setOptions({ duration: 250, fade: true })
 
 const LOGO = require('../assets/icon.png')
 
@@ -39,7 +34,7 @@ export default function RootLayout() {
 
     SplashScreen.hideAsync().catch(() => {})
 
-    const timer = setTimeout(() => setShowLaunch(false), 1100)
+    const timer = setTimeout(() => setShowLaunch(false), 1800)
     return () => clearTimeout(timer)
   }, [fontsLoaded, fontError])
 
@@ -51,15 +46,23 @@ export default function RootLayout() {
     <>
       <StatusBar style={showLaunch ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false }} />
+
       {showLaunch ? (
         <View style={styles.launch}>
           <View style={styles.glow} />
+
           <View style={styles.logoCircle}>
             <Image source={LOGO} style={styles.logo} resizeMode="contain" />
           </View>
+
           <Text style={styles.portalTitle}>PORTAL DO ALUNO</Text>
+
           <View style={styles.accentLine} />
-          <Text style={styles.tagline}>APRENDER. EVOLUIR. CONQUISTAR.</Text>
+
+          <Text style={styles.tagline}>
+            APRENDER. EVOLUIR. CONQUISTAR.
+          </Text>
+
           <Text style={styles.footer}>AB ACADEMY</Text>
         </View>
       ) : null}
@@ -74,6 +77,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 28,
+    zIndex: 999,
+    elevation: 999,
   },
   glow: {
     position: 'absolute',
