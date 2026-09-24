@@ -3,7 +3,7 @@ import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleS
 import { router } from 'expo-router'
 import { canEnterLesson, getNextLessonOccurrence, getStudentIdentity } from '@/lib/student'
 import { supabase } from '@/lib/supabase'
-import { colors, radius, shadow, spacing, typography } from '@/constants/theme'
+import { colors, fonts, radius, shadow, spacing, typography } from '@/constants/theme'
 import { AppCard } from '@/components/AppCard'
 
 type Lesson = {
@@ -299,9 +299,10 @@ const styles = StyleSheet.create({
     height: 62,
   },
   portalTitle: {
+    fontFamily: fonts.bold,
     fontSize: 12,
     lineHeight: 16,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 1.8,
     color: colors.textSecondary,
     marginTop: -2,
@@ -330,6 +331,7 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   profileInitial: {
+    fontFamily: fonts.extraBold,
     fontSize: 17,
     fontWeight: '800',
     color: colors.white,
@@ -421,6 +423,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   lessonTime: {
+    fontFamily: fonts.extraBold,
     fontSize: 36,
     lineHeight: 42,
     fontWeight: '800',
@@ -444,6 +447,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   teacherInitial: {
+    fontFamily: fonts.extraBold,
     fontSize: 14,
     fontWeight: '800',
     color: colors.primary,
@@ -482,6 +486,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   buttonArrow: {
+    fontFamily: fonts.bold,
     fontSize: 18,
     fontWeight: '700',
     color: colors.white,
@@ -501,6 +506,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emptyIconText: {
+    fontFamily: fonts.regular,
     fontSize: 24,
     fontWeight: '400',
     color: colors.primary,
@@ -543,11 +549,13 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   statIconText: {
+    fontFamily: fonts.extraBold,
     fontSize: 18,
     fontWeight: '800',
     color: colors.primary,
   },
   statNumber: {
+    fontFamily: fonts.extraBold,
     fontSize: 26,
     lineHeight: 32,
     fontWeight: '800',
@@ -560,6 +568,8 @@ const styles = StyleSheet.create({
     minHeight: 36,
   },
   statLink: {
+    ...typography.caption,
+    fontFamily: fonts.bold,
     fontSize: 12,
     lineHeight: 18,
     fontWeight: '700',
