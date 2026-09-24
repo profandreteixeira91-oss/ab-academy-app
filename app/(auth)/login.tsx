@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseConfigured } from '@/lib/supabase'
 import { colors, fonts, typography } from '@/constants/theme'
 
 export default function LoginScreen() {
@@ -39,6 +39,14 @@ export default function LoginScreen() {
   async function handleLogin() {
     if (!email.trim() || !password) {
       Alert.alert('Atenção', 'Informe seu e-mail e senha.')
+      return
+    }
+
+    if (!supabaseConfigured) {
+      Alert.alert(
+        'Ambiente não configurado',
+        'Este build não recebeu as variáveis EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Configure o ambiente Preview no EAS e gere um novo APK.'
+      )
       return
     }
 
@@ -113,10 +121,19 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
+        {!supabaseConfigured ? (
+          <View style={styles.configWarning}>
+            <Text style={styles.configWarningTitle}>Ambiente de teste não configurado</Text>
+            <Text style={styles.configWarningText}>
+              Configure as variáveis do Supabase no ambiente Preview do EAS antes de gerar o APK.
+            </Text>
+          </View>
+        ) : null}
+
         <Pressable
-          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed, !supabaseConfigured && styles.buttonDisabled]}
           onPress={handleLogin}
-          disabled={loading}
+          disabled={loading || !supabaseConfigured}
         >
           {loading ? (
             <ActivityIndicator color={colors.white} />
@@ -217,6 +234,27 @@ const styles = StyleSheet.create({
   buttonText: {
     ...typography.button,
     color: colors.white,
+  },
+  buttonDisabled: {
+    opacity: 0.45,
+  },
+  configWarning: {
+    borderWidth: 1,
+    borderColor: colors.warning,
+    backgroundColor: colors.warningSoft,
+    borderRadius: 14,
+    padding: 12,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  configWarningTitle: {
+    ...typography.bodyMedium,
+    color: colors.text,
+  },
+  configWarningText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 4,
   },
   link: {
     ...typography.bodyMedium,
