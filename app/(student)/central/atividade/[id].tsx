@@ -105,6 +105,18 @@ export default function CentralActivityScreen() {
 
   useEffect(() => {
     if (!activityId) return
+
+    // Cada atividade deve iniciar com seu próprio estado.
+    // Evita que respostas, resultado ou tradução da atividade anterior
+    // apareçam enquanto a nova atividade está sendo carregada.
+    answersLoaded.current = false
+    setAnswers({})
+    setResult(null)
+    setTranslation(null)
+    setNextActivity(null)
+    setError('')
+    setLoading(true)
+
     let mounted = true
 
     async function load() {
