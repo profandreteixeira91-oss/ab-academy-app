@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Image, Platform, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { usePathname } from 'expo-router'
-import { colors, fonts, radius } from '@/constants/theme'
+import { colors, fonts } from '@/constants/theme'
 
 const LOGO_URL =
   'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png'
