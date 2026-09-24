@@ -20,67 +20,80 @@ export const colors = {
   black: '#000000',
 } as const
 
-/*
- * Sistema tipográfico global da AB Academy.
- * A fonte nativa do sistema mantém o app leve e oferece ótima leitura
- * em Android e iOS, com uma hierarquia mais moderna e refinada.
- */
+export const fonts = {
+  regular: 'Inter_400Regular',
+  medium: 'Inter_500Medium',
+  semibold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+  extraBold: 'Inter_800ExtraBold',
+} as const
+
 export const typography = {
   display: {
+    fontFamily: fonts.extraBold,
     fontSize: 32,
     lineHeight: 38,
     fontWeight: '800' as const,
     letterSpacing: -0.8,
   },
   h1: {
+    fontFamily: fonts.extraBold,
     fontSize: 28,
     lineHeight: 34,
     fontWeight: '800' as const,
     letterSpacing: -0.5,
   },
   h2: {
+    fontFamily: fonts.bold,
     fontSize: 22,
     lineHeight: 28,
     fontWeight: '700' as const,
     letterSpacing: -0.3,
   },
   h3: {
+    fontFamily: fonts.bold,
     fontSize: 18,
     lineHeight: 24,
     fontWeight: '700' as const,
     letterSpacing: -0.1,
   },
   body: {
+    fontFamily: fonts.regular,
     fontSize: 15,
     lineHeight: 22,
     fontWeight: '400' as const,
     letterSpacing: 0,
   },
   bodyMedium: {
+    fontFamily: fonts.semibold,
     fontSize: 15,
     lineHeight: 22,
     fontWeight: '600' as const,
     letterSpacing: -0.05,
   },
   caption: {
+    fontFamily: fonts.medium,
     fontSize: 12,
     lineHeight: 18,
     fontWeight: '500' as const,
     letterSpacing: 0.1,
   },
   overline: {
+    fontFamily: fonts.bold,
     fontSize: 11,
     lineHeight: 16,
     fontWeight: '700' as const,
     letterSpacing: 1.2,
   },
   button: {
+    fontFamily: fonts.bold,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '700' as const,
     letterSpacing: 0.1,
   },
   tab: {
+    fontFamily: fonts.semibold,
     fontSize: 11,
     lineHeight: 14,
     fontWeight: '600' as const,
