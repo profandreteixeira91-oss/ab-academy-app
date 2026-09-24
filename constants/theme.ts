@@ -20,15 +20,72 @@ export const colors = {
   black: '#000000',
 } as const
 
+/*
+ * Sistema tipográfico global da AB Academy.
+ * A fonte nativa do sistema mantém o app leve e oferece ótima leitura
+ * em Android e iOS, com uma hierarquia mais moderna e refinada.
+ */
 export const typography = {
-  display: { fontSize: 32, lineHeight: 38, fontWeight: '800' as const },
-  h1: { fontSize: 28, lineHeight: 34, fontWeight: '800' as const },
-  h2: { fontSize: 22, lineHeight: 28, fontWeight: '800' as const },
-  h3: { fontSize: 18, lineHeight: 24, fontWeight: '700' as const },
-  body: { fontSize: 15, lineHeight: 22, fontWeight: '400' as const },
-  bodyMedium: { fontSize: 15, lineHeight: 22, fontWeight: '600' as const },
-  caption: { fontSize: 12, lineHeight: 18, fontWeight: '600' as const },
-  overline: { fontSize: 11, lineHeight: 16, fontWeight: '800' as const, letterSpacing: 1.1 },
+  display: {
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '800' as const,
+    letterSpacing: -0.8,
+  },
+  h1: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '800' as const,
+    letterSpacing: -0.5,
+  },
+  h2: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '700' as const,
+    letterSpacing: -0.3,
+  },
+  h3: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '700' as const,
+    letterSpacing: -0.1,
+  },
+  body: {
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: '400' as const,
+    letterSpacing: 0,
+  },
+  bodyMedium: {
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: '600' as const,
+    letterSpacing: -0.05,
+  },
+  caption: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '500' as const,
+    letterSpacing: 0.1,
+  },
+  overline: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: '700' as const,
+    letterSpacing: 1.2,
+  },
+  button: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '700' as const,
+    letterSpacing: 0.1,
+  },
+  tab: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: '600' as const,
+    letterSpacing: 0.1,
+  },
 } as const
 
 export const spacing = {
@@ -56,5 +113,6 @@ export const shadow = {
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 },
     elevation: 3,
+    shadowOffset: { width: 0, height: 6 },
   },
 } as const
