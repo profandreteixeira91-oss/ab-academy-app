@@ -101,6 +101,7 @@ export default function CentralActivityScreen() {
   const [elapsed, setElapsed] = useState(0)
   const [startedAt, setStartedAt] = useState<number | null>(null)
   const [nextActivity, setNextActivity] = useState<{ id: string; titulo: string } | null>(null)
+  const [showInstructions, setShowInstructions] = useState(false)
   const answersLoaded = useRef(false)
 
   useEffect(() => {
@@ -114,6 +115,7 @@ export default function CentralActivityScreen() {
     setResult(null)
     setTranslation(null)
     setNextActivity(null)
+    setShowInstructions(false)
     setError('')
     setLoading(true)
 
@@ -512,9 +514,31 @@ export default function CentralActivityScreen() {
       </AppCard>
 
       {activity.instrucoes ? (
-        <View style={styles.instructions}>
-          <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
-          <View style={styles.instructionsCopy}><Text style={styles.instructionsTitle}>Como fazer</Text><Text style={styles.instructionsText}>{activity.instrucoes}</Text></View>
+        <View style={styles.instructionsSection}>
+          <Pressable
+            onPress={() => setShowInstructions((visible) => !visible)}
+            style={styles.instructionsToggle}
+          >
+            <View style={styles.instructionsToggleLeft}>
+              <Ionicons name="help-circle-outline" size={19} color={colors.primary} />
+              <Text style={styles.instructionsToggleText}>Como fazer?</Text>
+            </View>
+            <Ionicons
+              name={showInstructions ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+
+          {showInstructions ? (
+            <View style={styles.instructions}>
+              <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
+              <View style={styles.instructionsCopy}>
+                <Text style={styles.instructionsTitle}>Como fazer</Text>
+                <Text style={styles.instructionsText}>{activity.instrucoes}</Text>
+              </View>
+            </View>
+          ) : null}
         </View>
       ) : null}
 
@@ -614,7 +638,11 @@ const styles = StyleSheet.create({
   timerText: { ...typography.caption, color: colors.primary },
   title: { ...typography.h1, color: colors.text, marginTop: 9 },
   description: { ...typography.body, color: colors.textSecondary, marginTop: 7 },
-  instructions: { flexDirection: 'row', gap: 10, padding: 14, borderRadius: radius.md, backgroundColor: colors.primarySoft, marginBottom: 14 },
+  instructionsSection: { marginBottom: 14 },
+  instructionsToggle: { minHeight: 42, paddingHorizontal: 13, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  instructionsToggleLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  instructionsToggleText: { ...typography.bodyMedium, color: colors.primary },
+  instructions: { flexDirection: 'row', gap: 10, padding: 14, borderRadius: radius.md, backgroundColor: colors.primarySoft, marginTop: 8 },
   instructionsCopy: { flex: 1 },
   instructionsTitle: { ...typography.bodyMedium, color: colors.text },
   instructionsText: { ...typography.body, color: colors.textSecondary, marginTop: 2 },
