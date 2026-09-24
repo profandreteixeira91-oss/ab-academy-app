@@ -39,11 +39,7 @@
         "android.permission.BLUETOOTH"
       ],
       "backgroundColor": "#081A33",
-      "icon": "./assets/icon.png",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+      "icon": "./assets/icon.png"
     },
     "web": {
       "bundler": "metro"
