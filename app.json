@@ -8,6 +8,15 @@
     "userInterfaceStyle": "light",
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#081A33",
+          "image": "./assets/icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain"
+        }
+      ],
       "expo-sqlite",
       "@livekit/react-native-expo-plugin",
       "@config-plugins/react-native-webrtc"
@@ -28,7 +37,13 @@
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.WAKE_LOCK",
         "android.permission.BLUETOOTH"
-      ]
+      ],
+      "backgroundColor": "#081A33",
+      "icon": "./assets/icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
     },
     "web": {
       "bundler": "metro"
@@ -39,6 +54,8 @@
         "projectId": "7f92ca9f-0ddf-4d63-9ecc-466b86ff631f"
       }
     },
-    "icon": "./assets/icon.png"
+    "icon": "./assets/icon.png",
+    "backgroundColor": "#081A33",
+    "primaryColor": "#1769D1"
   }
 }
