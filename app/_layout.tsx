@@ -10,8 +10,8 @@ import Constants from 'expo-constants'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect } from 'react'
-import { Image, Platform, StyleSheet, Text, View, useState } from 'react-native'
+import { useEffect, useState } from 'react'
+import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import { colors, fonts } from '@/constants/theme'
 
 if (Platform.OS !== 'web' && Constants.appOwnership !== 'expo') {
