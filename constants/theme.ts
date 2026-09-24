@@ -113,6 +113,5 @@ export const shadow = {
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 },
     elevation: 3,
-    shadowOffset: { width: 0, height: 6 },
   },
 } as const
