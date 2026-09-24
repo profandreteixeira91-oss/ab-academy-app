@@ -4,6 +4,7 @@ import { ActivityIndicator, ColorValue, StyleSheet, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
 import { colors, radius, typography } from '@/constants/theme'
+import { StudentHeader } from '@/components/StudentHeader'
 
 const tabs = {
   inicio: { icon: 'home-outline', activeIcon: 'home' },
@@ -70,6 +71,9 @@ export default function StudentLayout() {
   if (!authenticated) return <Redirect href="/(auth)/login" />
 
   return (
+    <View style={styles.screen}>
+      <StudentHeader />
+      <View style={styles.tabsContainer}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -144,10 +148,19 @@ export default function StudentLayout() {
         }}
       />
     </Tabs>
+      </View>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  tabsContainer: {
+    flex: 1,
+  },
   loading: {
     flex: 1,
     alignItems: 'center',
