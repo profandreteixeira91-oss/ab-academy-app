@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { router } from 'expo-router'
 import { canEnterLesson, getNextLessonOccurrence, getStudentIdentity } from '@/lib/student'
 import { supabase } from '@/lib/supabase'
@@ -125,30 +125,6 @@ export default function StudentHome() {
         />
       }
     >
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <View style={styles.headerBrand}>
-            <Image
-              source={{
-                uri: 'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png',
-              }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={styles.portalTitle}>PORTAL DO ALUNO</Text>
-          </View>
-
-          <Pressable style={styles.profileButton} onPress={() => router.push('/(student)/mais')}>
-            <Text style={styles.profileInitial}>{name.charAt(0).toUpperCase()}</Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.headerCopy}>
-          <Text style={styles.title}>Olá, {name.split(' ')[0]}!</Text>
-          <Text style={styles.subtitle}>Seu aprendizado continua aqui.</Text>
-        </View>
-      </View>
-
       {error ? (
         <View style={styles.error}>
           <Text style={styles.errorTitle}>Não foi possível atualizar</Text>
@@ -281,36 +257,6 @@ const styles = StyleSheet.create({
     paddingTop: 28,
     paddingBottom: 24,
   },
-  header: {
-    marginBottom: 30,
-  },
-  headerTop: {
-    minHeight: 78,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerBrand: {
-    flex: 1,
-    alignItems: 'flex-start',
-  },
-  logo: {
-    width: 205,
-    height: 62,
-  },
-  portalTitle: {
-    fontFamily: fonts.bold,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '700',
-    letterSpacing: 1.8,
-    color: colors.textSecondary,
-    marginTop: -2,
-    marginLeft: 2,
-  },
-  headerCopy: {
-    marginTop: 20,
-  },
   title: {
     ...typography.display,
     color: colors.text,
@@ -320,21 +266,6 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     marginTop: spacing.xs,
-  },
-  profileButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadow.card,
-  },
-  profileInitial: {
-    fontFamily: fonts.extraBold,
-    fontSize: 17,
-    fontWeight: '800',
-    color: colors.white,
   },
   error: {
     backgroundColor: colors.dangerSoft,
