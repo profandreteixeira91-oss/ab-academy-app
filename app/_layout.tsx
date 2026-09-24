@@ -54,11 +54,12 @@ export default function RootLayout() {
       {showLaunch ? (
         <View style={styles.launch}>
           <View style={styles.glow} />
-          <View style={styles.logoFrame}>
+          <View style={styles.logoCircle}>
             <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
           </View>
-          <Text style={styles.tagline}>APRENDER. EVOLUIR. CONQUISTAR.</Text>
+          <Text style={styles.portalTitle}>PORTAL DO ALUNO</Text>
           <View style={styles.accentLine} />
+          <Text style={styles.tagline}>APRENDER. EVOLUIR. CONQUISTAR.</Text>
           <Text style={styles.footer}>AB ACADEMY</Text>
         </View>
       ) : null}
@@ -82,32 +83,49 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(23, 105, 209, 0.18)',
     top: '28%',
   },
-  logoFrame: {
-    width: '88%',
-    maxWidth: 390,
-    height: 190,
+  logoCircle: {
+    width: 270,
+    height: 270,
+    borderRadius: 135,
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.22,
+    shadowRadius: 30,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: 12,
   },
   logo: {
     width: '100%',
     height: '100%',
   },
-  tagline: {
-    marginTop: 34,
-    fontFamily: fonts.bold,
-    fontSize: 11,
-    lineHeight: 16,
-    letterSpacing: 2.2,
-    color: '#D9E8FF',
+  portalTitle: {
+    marginTop: 30,
+    fontFamily: fonts.extraBold,
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '800',
+    letterSpacing: 2.4,
+    color: colors.white,
     textAlign: 'center',
   },
   accentLine: {
     width: 42,
     height: 2,
-    marginTop: 16,
+    marginTop: 15,
+    marginBottom: 15,
     borderRadius: 2,
     backgroundColor: '#4A90E2',
+  },
+  tagline: {
+    fontFamily: fonts.medium,
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 1.7,
+    color: '#D9E8FF',
+    textAlign: 'center',
   },
   footer: {
     position: 'absolute',
