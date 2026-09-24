@@ -71,15 +71,15 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
   },
   logoArea: {
-    width: 116,
+    width: 124,
     justifyContent: 'center',
   },
   logo: {
-    width: 108,
-    height: 38,
+    width: 120,
+    height: 42,
   },
   moduleArea: {
     flex: 1,
