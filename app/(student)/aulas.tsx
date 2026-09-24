@@ -17,7 +17,7 @@ import {
 } from '@/lib/student'
 import { supabase } from '@/lib/supabase'
 import { AppCard } from '@/components/AppCard'
-import { colors, radius, shadow, spacing, typography } from '@/constants/theme'
+import { colors, fonts, radius, shadow, spacing, typography } from '@/constants/theme'
 
 type Lesson = {
   id: string
@@ -123,18 +123,16 @@ export default function AulasScreen() {
       }
     >
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>AGENDA</Text>
-        <Text style={styles.title}>Minhas aulas</Text>
-        <Text style={styles.subtitle}>Sua programação semanal em um só lugar.</Text>
-      </View>
-
-      <View style={styles.summary}>
-        <View style={styles.summaryIcon}>
-          <Text style={styles.summaryIconText}>▣</Text>
-        </View>
-        <View style={styles.summaryCopy}>
-          <Text style={styles.summaryNumber}>{lessons.length}</Text>
-          <Text style={styles.summaryLabel}>aulas na sua agenda</Text>
+        <View style={styles.headerRow}>
+          <View style={styles.headerCopy}>
+            <Text style={styles.eyebrow}>SUA AGENDA</Text>
+            <Text style={styles.title}>Minhas aulas</Text>
+            <Text style={styles.subtitle}>Acompanhe seus horários e entre na aula no momento certo.</Text>
+          </View>
+          <View style={styles.headerCount}>
+            <Text style={styles.headerCountNumber}>{lessons.length}</Text>
+            <Text style={styles.headerCountLabel}>aulas</Text>
+          </View>
         </View>
       </View>
 
@@ -192,7 +190,7 @@ export default function AulasScreen() {
                 <Pressable
                   style={({ pressed }) => [
                     styles.button,
-                    !ready && styles.buttonDisabled,
+                    ready ? styles.buttonReady : styles.buttonUnavailable,
                     pressed && ready && styles.buttonPressed,
                   ]}
                   disabled={!ready}
@@ -243,7 +241,35 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   header: {
-    marginBottom: 22,
+    marginBottom: 24,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+  headerCopy: {
+    flex: 1,
+  },
+  headerCount: {
+    minWidth: 62,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+  },
+  headerCountNumber: {
+    ...typography.h2,
+    color: colors.primary,
+  },
+  headerCountLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: -1,
   },
   eyebrow: {
     ...typography.overline,
@@ -252,12 +278,13 @@ const styles = StyleSheet.create({
   title: {
     ...typography.display,
     color: colors.text,
-    marginTop: spacing.sm,
+    marginTop: 5,
   },
   subtitle: {
     ...typography.body,
     color: colors.textSecondary,
-    marginTop: spacing.xs,
+    marginTop: 7,
+    maxWidth: 330,
   },
   summary: {
     flexDirection: 'row',
@@ -373,11 +400,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   time: {
-    fontSize: 32,
-    lineHeight: 38,
+    fontFamily: fonts.extraBold,
+    fontSize: 34,
+    lineHeight: 40,
     fontWeight: '800',
+    letterSpacing: -0.6,
     color: colors.text,
-    marginTop: 2,
+    marginTop: 1,
   },
   teacherRow: {
     flexDirection: 'row',
@@ -397,6 +426,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   teacherInitial: {
+    fontFamily: fonts.extraBold,
     fontSize: 13,
     fontWeight: '800',
     color: colors.primary,
@@ -419,15 +449,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
   },
-  buttonDisabled: {
-    backgroundColor: '#E4E7EC',
+  buttonReady: {
+    backgroundColor: colors.success,
+  },
+  buttonUnavailable: {
+    backgroundColor: colors.danger,
   },
   buttonPressed: {
     opacity: 0.82,
     transform: [{ scale: 0.99 }],
   },
   buttonText: {
-    ...typography.bodyMedium,
+    ...typography.button,
     color: colors.white,
   },
   buttonArrow: {
