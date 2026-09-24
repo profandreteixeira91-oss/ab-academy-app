@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { router } from 'expo-router'
 import { canEnterLesson, getNextLessonOccurrence, getStudentIdentity } from '@/lib/student'
 import { supabase } from '@/lib/supabase'
@@ -126,8 +126,17 @@ export default function StudentHome() {
       }
     >
       <View style={styles.header}>
+        <View style={styles.headerBrand}>
+          <Image
+            source={{
+              uri: 'https://raw.githubusercontent.com/profandreteixeira91-oss/ab-academy/main/src/assets/logo_abacademy.png',
+            }}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.portalTitle}>PORTAL DO ALUNO</Text>
+        </View>
         <View style={styles.headerCopy}>
-          <Text style={styles.eyebrow}>PORTAL DO ALUNO</Text>
           <Text style={styles.title}>Olá, {name.split(' ')[0]}!</Text>
           <Text style={styles.subtitle}>Seu aprendizado continua aqui.</Text>
         </View>
@@ -269,18 +278,34 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   header: {
+    minHeight: 128,
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     marginBottom: 28,
+    position: 'relative',
   },
-  headerCopy: {
+  headerBrand: {
     flex: 1,
     paddingRight: spacing.lg,
   },
-  eyebrow: {
-    ...typography.overline,
-    color: colors.textSecondary,
+  logo: {
+    width: 150,
+    height: 46,
+  },
+  portalTitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '800',
+    letterSpacing: 1.6,
+    color: colors.text,
+    marginTop: 2,
+  },
+  headerCopy: {
+    position: 'absolute',
+    left: 0,
+    top: 70,
+    width: '100%',
   },
   title: {
     ...typography.display,
